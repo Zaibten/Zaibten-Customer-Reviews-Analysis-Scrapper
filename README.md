@@ -54,6 +54,8 @@ By analyzing customer reviews from multiple platforms, ZAIBTEN SCRAPPER helps bu
 # 🚀 Ready to start scraping and analyzing data?
 Join ZAIBTEN SCRAPPER today and unlock the power of web scraping, customer review analysis, sentiment analysis, and automated reporting. Leverage the power of AI and machine learning to drive your business decisions with confidence! 🔥
 
+#WebScraping #DataScience #NLP #EmailAutomation #NodeJS #MongoDB #Flask #JupyterNotebook #AdminPanel #DataAnalysis #MachineLearning #CustomerSentimentAnalysis #ZAIBTEN SCRAPPER #TechInnovation
+
 # 📸 Some Screenshots of the Project 🖼️✨
 ![image](https://github.com/user-attachments/assets/543897f8-9371-4b0c-a200-368e19976332)
 ![image](https://github.com/user-attachments/assets/7458340a-4914-4c51-9abd-fd19128a7580)
@@ -72,5 +74,3 @@ Join ZAIBTEN SCRAPPER today and unlock the power of web scraping, customer revie
 ![image](https://github.com/user-attachments/assets/44ce4c84-7f00-4ba4-808f-8d0f8fb4ef5f)
 ![image](https://github.com/user-attachments/assets/658220fe-651e-4374-8096-0445e9d21b80)
 ![image](https://github.com/user-attachments/assets/59d982a6-1c2e-40bc-94dd-a351a98fe203)
-
-#WebScraping #DataScience #NLP #EmailAutomation #NodeJS #MongoDB #Flask #JupyterNotebook #AdminPanel #DataAnalysis #MachineLearning #CustomerSentimentAnalysis #ZAIBTEN SCRAPPER #TechInnovation
