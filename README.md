@@ -1,5 +1,5 @@
 # 🚀 Introducing ZAIBTEN: Your All-in-One Web Scraping & Analysis Platform For Customer Reviews Analysis! 🚀
-🔍 ZAIBTEN is a cutting-edge solution designed to scrape and analyze customer reviews from top platforms like Amazon, eBay, and Yelp. Powered by advanced web scraping technology and Natural Language Processing (NLP), ZAIBTEN provides actionable insights, helping you understand customer sentiment and make informed decisions! 💡📊
+🔍 ZAIBTEN is a cutting-edge solution designed to scrape and analyze customer reviews from top platforms like Amazon, eBay, and Yelp. Powered by advanced web scraping technology and Natural Language Processing (NLP), ZAIBTEN provides actionable insights, helping you understand customer sentiment and make informed decisions! 💡
 
 # 🔍 What is ZAIBTEN?
 ZAIBTEN is a cutting-edge customer reviews analysis software powered by web scraping, Natural Language Processing (NLP), and machine learning. It is designed to scrape, analyze, and visualize customer feedback from major e-commerce and review platforms such as Amazon, eBay, and Yelp.
