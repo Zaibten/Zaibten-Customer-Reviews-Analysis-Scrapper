@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zaibten</title>
+    <title>Ebay Scrapper | Zaibten/title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Google Fonts -->
@@ -59,8 +59,8 @@
       </script>
     <style>
         body {
-            background-color: #f8f9fa;
-            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffffff, #f7f7f7);
+            font-family: 'Poppins', sans-serif;
         }
         .nav-item.dropdown:hover .dropdown-menu {
   display: block;
@@ -212,29 +212,73 @@
 
     /* Footer Styles */
     .footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background-color: #343a40;
-        color: white;
-        text-align: center;
-        padding: 10px;
-        animation: slideIn 0.5s ease-in-out;
-    }
+            background-color: #111;
+            color: #bbb;
+            padding: 60px 20px;
+            text-align: center;
+        }
 
-    .footer a {
-        color: #007bff;
-        text-decoration: none;
-    }
+        .footer-logo img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
 
-    .footer a:hover {
-        text-decoration: underline;
-    }
+        .footer-logo h5 {
+            margin-top: 10px;
+        }
 
-    .footer p {
-        margin: 0;
-    }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .footer-links .footer-link {
+            color: #ccc;
+            font-size: 18px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links .footer-link:hover {
+            color: #fff;
+        }
+
+        .footer-social-icons {
+            margin-top: 30px;
+        }
+
+        .footer-social-icons a {
+            color: #ccc;
+            font-size: 25px;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-social-icons a:hover {
+            color: #fff;
+        }
+
+        .footer-about {
+            margin-top: 40px;
+            font-size: 16px;
+            color: #bbb;
+        }
+
+        .footer-about p {
+            line-height: 1.6;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .footer-links {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+
     
         h1, h2 {
             animation: fadeIn 1s ease-in-out;
@@ -480,33 +524,34 @@
             </button>
     
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <div class="d-flex mx-auto flex-column flex-lg-row align-items-center">
-                    <ul class="navbar-nav">
-                      <li class="nav-item active">
-                        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="/index">Review Analysis</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="/about.html">About Us</a>
-                      </li>
-                      <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="/livescrap" id="liveScrapDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                          Live Scrapper
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="liveScrapDropdown">
-                          <li><a class="dropdown-item" href="#">Live Scrapper</a></li>
-                          <li><a class="dropdown-item" href="/livescrap">Amazon Scrapper</a></li>
-                          <li><a class="dropdown-item" href="/ebay_index">Ebay Scrapper</a></li>
-                          <!-- <li><a class="dropdown-item" href="/scrap-help">Help</a></li> -->
-                        </ul>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="contact.html">Contact Us</a>
-                      </li>
+              <div class="d-flex mx-auto flex-column flex-lg-row align-items-center">
+                <ul class="navbar-nav">
+                  <li class="nav-item active">
+                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/index">Review Analysis</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/about">About Us</a>
+                  </li>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="/livescrap" id="liveScrapDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Live Scrapper
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="liveScrapDropdown">
+                      <li><a class="dropdown-item" href="#">Yelp Scrapper</a></li>
+                      <li><a class="dropdown-item" href="/livescrap">Amazon Scrapper</a></li>
+                      <li><a class="dropdown-item" href="/ebay_index">Ebay Scrapper</a></li>
+                      <!-- <li><a class="dropdown-item" href="/scrap-help">Help</a></li> -->
                     </ul>
-                  </div>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/contact">Contact Us</a>
+                  </li>
+                </ul>
+              </div>
+              
               <div class="quote_btn-container">
                 {% if username %}
                   <a href="#">
@@ -690,7 +735,7 @@
         <!-- end slider section -->
       </div>
     <div class="container mt-5" id="scroll_container">
-        <h1 class="text-center">Ebay Product Review Scraperpper</h1>
+        <h1 class="text-center">Ebay Product Review Scrapper</h1>
         <form method="POST" onsubmit="showLoader()">
             <div class="form-group">
                 <label for="product_name">Product Name</label>
@@ -798,9 +843,32 @@
     
     
 
-    <br><br><footer class="footer">
-        <p>&copy; 2024 Review Analysis Dashboard | <a href="#">Privacy Policy</a></p>
-    </footer>
+    <br><br>
+    
+<!-- Footer -->
+<div class="footer">
+    <div class="footer-logo">
+        <img src="../static/images/logo.png" alt="Logo">
+        <h5>Z A I B T E N</h5>
+    </div>
+    <div class="footer-links">
+        <a href="#" class="footer-link">Home</a>
+        <a href="#" class="footer-link">About</a>
+        <a href="#" class="footer-link">Services</a>
+        <a href="#" class="footer-link">Blog</a>
+        <a href="#" class="footer-link">Contact</a>
+    </div>
+    <div class="footer-social-icons">
+        <a href="#" class="fab fa-facebook-f"></a>
+        <a href="#" class="fab fa-twitter"></a>
+        <a href="#" class="fab fa-linkedin-in"></a>
+        <a href="#" class="fab fa-instagram"></a>
+    </div>
+    <div class="footer-about">
+        <p>MyApp is a platform that provides reliable customer reviews and analysis to help you make the best buying decisions. With a focus on transparency and authenticity, we aim to be the most trusted review platform.</p>
+        <p>For more information, feel free to contact us via our contact page or visit our FAQ section for any inquiries.</p>
+    </div>
+</div>
 
 <script>
 function showLoader() {
