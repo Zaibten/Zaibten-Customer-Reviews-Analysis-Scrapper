@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/4d6ad826-a3a4-4eee-a03d-198ebd90e767)# 🚀 Introducing ZAIBTEN SCRAPPER: Your All-in-One Web Scraping & Analysis Platform For Customer Reviews Analysis! 🚀
+🚀 Introducing ZAIBTEN SCRAPPER: Your All-in-One Web Scraping & Analysis Platform For Customer Reviews Analysis! 🚀
 🔍 ZAIBTEN SCRAPPER is a cutting-edge solution designed to scrape and analyze customer reviews from top platforms like Amazon, eBay, and Yelp. Powered by advanced web scraping technology and Natural Language Processing (NLP), ZAIBTEN SCRAPPER provides actionable insights, helping you understand customer sentiment and make informed decisions! 💡
 
 # 🔍 What is ZAIBTEN SCRAPPER?
@@ -11,8 +11,8 @@ ZAIBTEN SCRAPPER goes beyond just scraping data — it analyzes and visualizes i
 2.	Sentiment analysis of customer reviews (positive, negative, neutral)
 3.	Comparative analysis of different products or sellers
 4.	Customer behavior and feedback trends
-5.	Figma Design link https://www.figma.com/design/xXfsw4XTorvrlwGussi7jG/ZAIBTEN-WEB-SCRAPPER-FIGMA-DESIGN?node-id=0-1&p=f&t=sjSLsNlc8X0BvdyL-0
-This real-time data empowers businesses to make quick, data-driven decisions based on the latest customer feedback. 📉📊
+5.	This real-time data empowers businesses to make quick, data-driven decisions based on the latest customer feedback.
+6.	Figma Design link https://www.figma.com/design/xXfsw4XTorvrlwGussi7jG/ZAIBTEN-WEB-SCRAPPER-FIGMA-DESIGN?node-id=0-1&p=f&t=sjSLsNlc8X0BvdyL-0
 
 # 📧 Automated Email Reports
 ZAIBTEN SCRAPPER integrates seamlessly with email automation, allowing you to automatically send detailed analysis reports to your email without manual effort. Once data is scraped and processed, ZAIBTEN SCRAPPER generates a comprehensive report and sends it directly to your inbox. These reports include:
