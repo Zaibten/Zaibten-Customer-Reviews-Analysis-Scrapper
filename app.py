@@ -848,6 +848,29 @@ def index():
                            review_length_plot=review_length_plot, ratings_heatmap_plot=ratings_heatmap_plot)
 
 
+
+@app.route('/about', methods=['GET', 'POST'])
+def about():
+    # Check if user is logged in
+    if 'user_id' in session:
+        user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
+        username = user['name']  # Assuming the user's name is stored in the database
+    else:
+        username = None
+        
+    return render_template("about.html", username=username)
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    # Check if user is logged in
+    if 'user_id' in session:
+        user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
+        username = user['name']  # Assuming the user's name is stored in the database
+    else:
+        username = None
+        
+    return render_template("contact.html", username=username)
+
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)  # Clear the session
