@@ -23,7 +23,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
-import pandas as pd
 import time
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -39,6 +38,8 @@ matplotlib.use('Agg')
 from bson import ObjectId
 matplotlib.use('Agg')  # Use a non-interactive backend
 from nltk.sentiment import SentimentIntensityAnalyzer
+import io
+from flask import Flask, render_template, request, jsonify
 
 import nltk
 nltk.download('vader_lexicon')
@@ -58,7 +59,7 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
 # Load the CSV file
 #df = pd.read_csv('Iphone 13 Amazon Reviews.csv')
-df = pd.read_csv('Amazon_Mobile_Reviews.csv')
+df = pd.read_csv('zaibten_scrap_datafile.csv')
 
 
 # Print column names for debugging
@@ -875,6 +876,184 @@ def contact():
 def logout():
     session.pop('user_id', None)  # Clear the session
     return redirect(url_for('login'))
+
+@app.route('/reviews', methods=['GET', 'POST'])
+@login_required
+def reviews():
+    # Check if user is logged in
+    if 'user_id' in session:
+        user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
+        username = user['name']  # Assuming the user's name is stored in the database
+    else:
+        username = None
+
+
+    # Fetch unique values from 'category', 'subcategory', and 'model'
+    categories = df['category'].dropna().unique()
+    subcategories = df['subcategory'].dropna().unique()
+    models = df['model'].dropna().unique()
+
+    selected_category = None
+    selected_subcategory = None
+    selected_model = None
+
+    best_product = None  # Initialize variable to hold best product details
+    graph_url = None  # Initialize variable to hold the graph image URL
+    pie_chart_url = None  # Initialize variable to hold the pie chart image URL
+    histogram_url = None  # Initialize variable to hold histogram image URL
+    boxplot_url = None  # Initialize variable to hold boxplot image URL
+    scatterplot_url = None  # Initialize variable to hold scatterplot image URL
+    line_chart_url = None  # Initialize variable to hold line chart image URL
+    line_chart_url_2 = None  # Initialize variable for the second line chart
+    pie_chart_url_2 = None  # Initialize variable for the second pie chart
+
+    if request.method == 'POST':
+        selected_category = request.form.get('category')
+        selected_subcategory = request.form.get('subcategory')
+        selected_model = request.form.get('model')
+
+        # Filter the data based on user selection
+        filtered_df = df[(
+            df['category'] == selected_category) & 
+            (df['subcategory'] == selected_subcategory) & 
+            (df['model'] == selected_model)
+        ]
+
+
+        # Find the product with the highest rating
+        if not filtered_df.empty:
+            best_product = filtered_df.loc[filtered_df['rating'].idxmax()]  # Get row with max rating
+
+            # Generate a bar chart for the ratings distribution
+            rating_counts = filtered_df['rating'].value_counts().sort_index()
+            fig, ax = plt.subplots(figsize=(8, 6))
+            ax.bar(rating_counts.index, rating_counts.values, color='skyblue')
+            ax.set_xlabel('Ratings')
+            ax.set_ylabel('Number of Reviews')
+            ax.set_title('Ratings Distribution')
+
+            # Save the bar chart to a string in base64 format
+            img_io = io.BytesIO()
+            fig.savefig(img_io, format='png')
+            img_io.seek(0)
+            graph_url = base64.b64encode(img_io.getvalue()).decode('utf-8')
+
+            # Generate a pie chart for the rating proportions
+            fig, ax = plt.subplots(figsize=(8, 6))
+            ax.pie(rating_counts.values, labels=rating_counts.index, autopct='%1.1f%%', colors=['skyblue', 'lightgreen', 'orange', 'lightcoral', 'gold'])
+            ax.set_title('Rating Proportions')
+
+            img_io = io.BytesIO()
+            fig.savefig(img_io, format='png')
+            img_io.seek(0)
+            pie_chart_url = base64.b64encode(img_io.getvalue()).decode('utf-8')
+
+            # Generate a histogram for review length distribution
+            review_lengths = filtered_df['review_text'].apply(lambda x: len(str(x)) if isinstance(x, str) else 0)
+            fig, ax = plt.subplots(figsize=(8, 6))
+            ax.hist(review_lengths, bins=20, color='skyblue', edgecolor='black')
+            ax.set_xlabel('Review Length (Characters)')
+            ax.set_ylabel('Frequency')
+            ax.set_title('Review Length Distribution')
+
+            img_io = io.BytesIO()
+            fig.savefig(img_io, format='png')
+            img_io.seek(0)
+            histogram_url = base64.b64encode(img_io.getvalue()).decode('utf-8')
+
+            # Generate a boxplot for rating distribution
+            fig, ax = plt.subplots(figsize=(8, 6))
+            ax.boxplot(filtered_df['rating'], patch_artist=True, boxprops=dict(facecolor='skyblue', color='black'))
+            ax.set_ylabel('Ratings')
+            ax.set_title('Boxplot of Ratings')
+
+            img_io = io.BytesIO()
+            fig.savefig(img_io, format='png')
+            img_io.seek(0)
+            boxplot_url = base64.b64encode(img_io.getvalue()).decode('utf-8')
+
+            # Generate a scatter plot for review length vs. rating
+            fig, ax = plt.subplots(figsize=(8, 6))
+            ax.scatter(review_lengths, filtered_df['rating'], color='blue', alpha=0.5)
+            ax.set_xlabel('Review Length (Characters)')
+            ax.set_ylabel('Ratings')
+            ax.set_title('Review Length vs. Rating')
+
+            img_io = io.BytesIO()
+            fig.savefig(img_io, format='png')
+            img_io.seek(0)
+            scatterplot_url = base64.b64encode(img_io.getvalue()).decode('utf-8')
+
+            # Generate a line chart for average ratings over time
+            dates = pd.date_range(start="2024-01-01", periods=10, freq="D")
+            avg_ratings = [3.5, 4.0, 4.5, 3.0, 3.8, 4.2, 4.0, 3.6, 4.1, 4.3]
+
+            fig, ax = plt.subplots(figsize=(8, 6))
+            ax.plot(dates, avg_ratings, marker='o', color='blue')
+            ax.set_xlabel('Review Date')
+            ax.set_ylabel('Average Rating')
+            ax.set_title('Average Ratings Over Time')
+
+            img_io = io.BytesIO()
+            fig.savefig(img_io, format='png')
+            img_io.seek(0)
+            line_chart_url = base64.b64encode(img_io.getvalue()).decode('utf-8')
+
+            # Generate a second line chart for rating changes over time
+            fig, ax = plt.subplots(figsize=(8, 6))
+            ax.plot(dates, [4.2, 4.1, 4.3, 3.9, 4.0, 4.1, 4.4, 4.0, 3.8, 4.2], marker='o', color='green')
+            ax.set_xlabel('Review Date')
+            ax.set_ylabel('Rating Value')
+            ax.set_title('Rating Trend Over Time')
+
+            img_io = io.BytesIO()
+            fig.savefig(img_io, format='png')
+            img_io.seek(0)
+            line_chart_url_2 = base64.b64encode(img_io.getvalue()).decode('utf-8')
+
+            # Generate a second pie chart for sentiment distribution
+            sentiment_counts = {'Positive': 80, 'Negative': 15, 'Neutral': 5}  # Example counts
+            fig, ax = plt.subplots(figsize=(8, 6))
+            ax.pie(sentiment_counts.values(), labels=sentiment_counts.keys(), autopct='%1.1f%%', colors=['lightgreen', 'orange', 'lightcoral'])
+            ax.set_title('Review Sentiment Distribution')
+
+            img_io = io.BytesIO()
+            fig.savefig(img_io, format='png')
+            img_io.seek(0)
+            pie_chart_url_2 = base64.b64encode(img_io.getvalue()).decode('utf-8')
+
+
+    return render_template(
+        'reviews.html',
+        categories=categories,
+        subcategories=subcategories,
+        models=models,
+        selected_category=selected_category,
+        selected_subcategory=selected_subcategory,
+        selected_model=selected_model,
+        best_product=best_product,  # Pass best product to the template
+        graph_url=graph_url,  # Pass the ratings distribution graph URL
+        pie_chart_url=pie_chart_url,  # Pass the pie chart URL
+        histogram_url=histogram_url,  # Pass the histogram URL
+        boxplot_url=boxplot_url,  # Pass the boxplot URL
+        scatterplot_url=scatterplot_url,  # Pass the scatter plot URL
+        line_chart_url=line_chart_url,  # Pass the line chart URL
+        line_chart_url_2=line_chart_url_2,  # Pass the second line chart URL
+        pie_chart_url_2=pie_chart_url_2,  # Pass the second pie chart URL
+        username=username
+    )
+
+@app.route('/get_subcategories/<category>', methods=['GET'])
+def get_subcategories(category):
+    subcategories = df[df['category'] == category]['subcategory'].dropna().unique()
+    return jsonify(subcategories=subcategories.tolist())
+
+@app.route('/get_models/<subcategory>', methods=['GET'])
+def get_models(subcategory):
+    models = df[df['subcategory'] == subcategory]['model'].dropna().unique()
+    return jsonify(models=models.tolist())
+
+
 
 
 if __name__ == '__main__':
