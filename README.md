@@ -54,6 +54,23 @@ By analyzing customer reviews from multiple platforms, ZAIBTEN SCRAPPER helps bu
 # 🚀 Ready to start scraping and analyzing data?
 Join ZAIBTEN SCRAPPER today and unlock the power of web scraping, customer review analysis, sentiment analysis, and automated reporting. Leverage the power of AI and machine learning to drive your business decisions with confidence! 🔥
 
-# 📸 Some Screenshots of the Project 🖼️✨
-
 #WebScraping #DataScience #NLP #EmailAutomation #NodeJS #MongoDB #Flask #JupyterNotebook #AdminPanel #DataAnalysis #MachineLearning #CustomerSentimentAnalysis #ZAIBTEN SCRAPPER #TechInnovation
+
+# 📸 Some Screenshots of the Project 🖼️✨
+![image](https://github.com/user-attachments/assets/543897f8-9371-4b0c-a200-368e19976332)
+![image](https://github.com/user-attachments/assets/7458340a-4914-4c51-9abd-fd19128a7580)
+![image](https://github.com/user-attachments/assets/865cb26b-9a58-4ba2-a81f-98f73c76963e)
+![image](https://github.com/user-attachments/assets/41591bd7-f456-4990-9937-e9b5c6996f32)
+![image](https://github.com/user-attachments/assets/9ad3a5cd-2da5-46fa-a0e9-464948dc339f)
+![image](https://github.com/user-attachments/assets/86c2fc5e-1650-4661-a66e-0a9e866ebe30)
+![image](https://github.com/user-attachments/assets/04b42de3-7615-4e07-9747-fd7200630b47)
+![image](https://github.com/user-attachments/assets/3daf3017-ac88-456f-915d-d777965e8923)
+![image](https://github.com/user-attachments/assets/f7777f6f-ee80-4169-9222-9f78cd134e37)
+![image](https://github.com/user-attachments/assets/7289ec30-4073-4cf5-8875-9beab26b9d04)
+![image](https://github.com/user-attachments/assets/2c33cbeb-dc74-41d3-8dae-e7a91a18a93b)
+![image](https://github.com/user-attachments/assets/18a05e35-054a-4a14-a7b1-4430d9a1e617)
+![image](https://github.com/user-attachments/assets/4871638e-0c52-48bd-9b07-290cfa338f7d)
+![image](https://github.com/user-attachments/assets/264a4144-6aaf-4cd3-9d11-d3a1d073ad16)
+![image](https://github.com/user-attachments/assets/44ce4c84-7f00-4ba4-808f-8d0f8fb4ef5f)
+![image](https://github.com/user-attachments/assets/658220fe-651e-4374-8096-0445e9d21b80)
+![image](https://github.com/user-attachments/assets/59d982a6-1c2e-40bc-94dd-a351a98fe203)
