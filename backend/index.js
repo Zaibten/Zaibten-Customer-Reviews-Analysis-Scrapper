@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
           justify-content: center;
           align-items: center;
           height: 100vh;
-          background: #000;
+          background: linear-gradient(45deg, #000, #555);
           color: #fff;
           overflow: hidden;
         }
@@ -150,7 +150,6 @@ app.get('/', (req, res) => {
           window.location.href = '/home'; // Redirect to home if logged in
         }
       </script>
-      <div id="particles-js"></div>
       <div class="login-container">
         <img src="/assets/logo.png" alt="App Logo" class="logo">
         <h1>Zaibten Admin</h1>
