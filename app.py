@@ -1,8 +1,11 @@
 from email.mime.image import MIMEImage
 from functools import wraps
+import re
 from bson import ObjectId
 from flask import Flask, render_template, request, redirect, url_for, session
 import pandas as pd
+import requests
+from transformers import pipeline
 import matplotlib.pyplot as plt
 import io
 import base64
@@ -1041,6 +1044,236 @@ def get_subcategories(category):
 def get_models(subcategory):
     models = df[df['subcategory'] == subcategory]['model'].dropna().unique()
     return jsonify(models=models.tolist())
+
+
+
+
+# Load pre-trained sentiment-analysis model from Hugging Face
+sentiment_analyzer = pipeline("sentiment-analysis")
+
+def foodreviewssentiment_score(review):
+    result = sentiment_analyzer(review)
+    label = result[0]['label']
+    score = result[0]['score']
+    
+    if label == 'POSITIVE' and score > 0.5:
+        return "Positive"
+    elif label == 'NEGATIVE' and score > 0.5:
+        return "Negative"
+    else:
+        return "Neutral"
+
+def foodreviewsscrape_reviews(url, retries=3):
+    for attempt in range(retries):
+        try:
+            r = requests.get(url, timeout=10)
+            r.raise_for_status()
+            soup = BeautifulSoup(r.text, 'html.parser')
+
+            regex = re.compile('.*comment.*')
+            results = soup.find_all('p', {'class': regex}) or soup.find_all('p')
+            reviews = [result.get_text(strip=True) for result in results if result.get_text(strip=True)]
+
+            if not reviews:
+                raise ValueError("No reviews found. Retrying...")
+
+            review_data = pd.DataFrame({'review': reviews})
+            review_data['classification'] = review_data['review'].apply(lambda x: foodreviewssentiment_score(x[:512]))
+
+            review_data = review_data[review_data['classification'] != 'Neutral']
+
+            positive_count = len(review_data[review_data['classification'] == 'Positive'])
+            negative_count = len(review_data[review_data['classification'] == 'Negative'])
+
+            return review_data, positive_count, negative_count
+
+        except (requests.exceptions.RequestException, ValueError) as e:
+            print(f"Attempt {attempt + 1} failed: {e}")
+            time.sleep(2)
+
+    return pd.DataFrame(columns=['review', 'classification']), 0, 0
+
+def foodreviewscreate_graphs(positive_count, negative_count, review_data):
+    graphs = {}
+    
+    # 1. Sentiment Analysis Bar Chart
+    fig, ax = plt.subplots()
+    ax.bar(['Positive', 'Negative'], [positive_count, negative_count], color=['green', 'red'])
+    ax.set_xlabel('Sentiment')
+    ax.set_ylabel('Review Count')
+    ax.set_title('Review Sentiment Analysis')
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    graphs['sentiment_bar'] = base64.b64encode(img.getvalue()).decode('utf-8')
+    plt.close(fig)
+
+    # 2. Sentiment Analysis Pie Chart
+    fig, ax = plt.subplots()
+    ax.pie([positive_count, negative_count], labels=['Positive', 'Negative'], colors=['green', 'red'], autopct='%1.1f%%', startangle=90)
+    ax.set_title('Sentiment Distribution')
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    graphs['sentiment_pie'] = base64.b64encode(img.getvalue()).decode('utf-8')
+    plt.close(fig)
+
+    # 3. Sentiment Over Time Line Chart (Simulating with index as time)
+    review_data['sentiment_numeric'] = review_data['classification'].map({'Positive': 1, 'Negative': -1})
+    fig, ax = plt.subplots()
+    ax.plot(review_data.index, review_data['sentiment_numeric'], color='blue')
+    ax.set_xlabel('Review Index')
+    ax.set_ylabel('Sentiment')
+    ax.set_title('Sentiment Over Time (Reviews)')
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    graphs['sentiment_line'] = base64.b64encode(img.getvalue()).decode('utf-8')
+    plt.close(fig)
+
+    # 4. Word Cloud (Top 10 Frequent Words - Sampled)
+    from wordcloud import WordCloud
+    text = ' '.join(review_data['review'])
+    wordcloud = WordCloud(max_words=10).generate(text)
+    fig, ax = plt.subplots()
+    ax.imshow(wordcloud, interpolation='bilinear')
+    ax.axis('off')
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    graphs['wordcloud'] = base64.b64encode(img.getvalue()).decode('utf-8')
+    plt.close(fig)
+
+    # 5. Review Length vs Sentiment Box Plot
+    review_data['review_length'] = review_data['review'].apply(len)
+    fig, ax = plt.subplots()
+    sns.boxplot(x='classification', y='review_length', data=review_data, ax=ax)
+    ax.set_title('Review Length vs Sentiment')
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    graphs['review_length_box'] = base64.b64encode(img.getvalue()).decode('utf-8')
+    plt.close(fig)
+
+    # 6. Sentiment Distribution Over Review Length (New Graph)
+    fig, ax = plt.subplots()
+    sns.scatterplot(x='review_length', y='sentiment_numeric', data=review_data, hue='classification', palette='coolwarm', alpha=0.7)
+    ax.set_xlabel('Review Length')
+    ax.set_ylabel('Sentiment')
+    ax.set_title('Sentiment Distribution Over Review Length')
+    img = io.BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    graphs['sentiment_length'] = base64.b64encode(img.getvalue()).decode('utf-8')
+    plt.close(fig)
+
+    return graphs
+
+def foodreviewssend_email(positive_count, negative_count, graphs):
+    # Sender email and recipient email
+    sender_email = "muzamilkhanofficial786@gmail.com"
+    recipient_email = get_logged_in_user_email()
+    subject = "Zaibten Review Sentiment Analysis Report"
+
+    # Create the email message
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = recipient_email
+    msg['Subject'] = subject
+
+    # HTML email body (modern and professional)
+    html_body = f"""
+    <html>
+    <body style="font-family: 'Arial', sans-serif; background-color: #f2f2f2; margin: 0; padding: 0; color: #333333;">
+        <!-- Header -->
+        <div style="background-color: #ffffff; padding: 30px; text-align: center; border-bottom: 1px solid #ddd;">
+            <img src="cid:logo" alt="Zaibten Logo" style="border-radius: 10px; width: 120px; height: 120px;"/>
+            <h1 style="font-size: 26px; color: #333333; font-weight: 600; margin-top: 15px;">Zaibten Sentiment Analysis Report</h1>
+            <p style="font-size: 18px; color: #666666; margin-top: 10px;">Here is the analysis of your product's review sentiments. Please find the detailed results below.</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div style="padding: 30px; background-color: #ffffff; margin: 30px auto; width: 90%; max-width: 650px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <h2 style="font-size: 22px; color: #333333; margin-bottom: 15px;">Sentiment Overview</h2>
+            <p style="font-size: 16px; color: #333333; line-height: 1.6;">
+                <strong>Total Positive Reviews:</strong> <span style="color: #28a745; font-weight: bold;">{positive_count}</span><br>
+                <strong>Total Negative Reviews:</strong> <span style="color: #e74c3c; font-weight: bold;">{negative_count}</span><br><br>
+            </p>
+
+            <h3 style="font-size: 20px; color: #333333; margin-bottom: 15px;">Analysis Graphs</h3>
+            <p style="font-size: 16px; color: #555555; margin-bottom: 25px;">Below are the visual representations of the sentiment analysis results:</p>
+    """
+
+    # Attach graphs as images
+    for graph_name, graph_data in graphs.items():
+        img_data = base64.b64decode(graph_data)
+        image = MIMEImage(img_data, name=graph_name + '.png', _subtype="png")
+        image.add_header('Content-ID', f'<{graph_name}>')  # Content-ID for inline images
+        msg.attach(image)
+        html_body += f"""
+            <div style="margin-bottom: 30px;">
+                <img src="cid:{graph_name}" alt="{graph_name}" style="max-width: 100%; border-radius: 8px;"/>
+            </div>
+        """
+
+    # Footer with company info and contact
+    html_body += """
+        <div style="background-color: #ffffff; padding: 20px; text-align: center; font-size: 14px; color: #999999; margin-top: 30px;">
+            <p>&copy; 2025 Zaibten. All Rights Reserved.</p>
+            <p>For any queries or support, please contact us at <a href="mailto:support@zaibten.com" style="color: #555555; text-decoration: none;">support@zaibten.com</a></p>
+        </div>
+    </body>
+    </html>
+    """
+
+    # Attach the HTML body to the email
+    msg.attach(MIMEText(html_body, 'html'))
+
+    # Add the logo image as an inline attachment
+    with open("static/images/logo.png", "rb") as logo_file:
+        logo_data = logo_file.read()
+        logo = MIMEImage(logo_data, name="logo.png")
+        logo.add_header('Content-ID', '<logo>')
+        msg.attach(logo)
+
+    # Sending the email via SMTP server
+    try:
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()
+            server.login(sender_email, "iaqu xvna tpix ugkt")  # Login with your email and password
+            server.sendmail(sender_email, recipient_email, msg.as_string())
+            print("Email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
+@app.route("/foodreviews", methods=["GET", "POST"])
+def foodreviews():
+        # Check if user is logged in
+    if 'user_id' in session:
+        user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
+        username = user['name']  # Assuming the user's name is stored in the database
+    else:
+        username = None
+
+    if request.method == "POST":
+        url = request.form["url"]
+        review_data, positive_count, negative_count = foodreviewsscrape_reviews(url)
+
+        # Generate all graphs
+        graphs = foodreviewscreate_graphs(positive_count, negative_count, review_data)
+
+        # Send email with the review data and graphs
+        foodreviewssend_email(positive_count, negative_count, graphs)
+
+        return render_template(
+            "foodreviews.html",
+            review_data=review_data.to_html(classes="table table-bordered"),
+            positive_count=positive_count,
+            negative_count=negative_count,
+            graphs=graphs,
+            username=username
+        )
+    return render_template("foodreviews.html", review_data=None, positive_count=0, negative_count=0, graphs={})
 
 
 

@@ -69,14 +69,6 @@
       margin-top: 0;
       border-radius: 0;
     }
-            .loader {
-            display: none;
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 9999;
-        }
     
         .animated-img {
             animation: fadeIn 0.5s ease-in-out;
@@ -323,12 +315,6 @@
                 from { transform: translateY(20px); opacity: 0; }
                 to { transform: translateY(0); opacity: 1; }
             }
-        
-            .loading {
-                display: none; /* Initially hidden */
-                animation: fadeIn 0.8s ease-in-out;
-            }
-        
             .table-container {
                 max-height: 400px; /* Adjust height as necessary */
                 overflow-y: auto;  /* Enable vertical scrolling */
@@ -473,16 +459,6 @@
                 height: 40vh;
                 width: 100%;
             }
-            #loader {
-                position: fixed;
-                z-index: 1000;
-                width: 100%;
-                height: 100%;
-                background: rgba(255, 255, 255, 0.8);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
             
             .spinner-border {
                 width: 3rem;
@@ -497,15 +473,114 @@
         border-radius: 5px; /* Optional: round the corners */
     }
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+     /* Loader Styles */
+     .loader-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7); /* Semi-transparent dark overlay */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                display: none; /* Hidden by default */
+            }
+            .loader {
+                width: 50px;
+                height: 50px;
+                border: 6px solid transparent;
+                border-top: 6px solid #007bff;
+                border-bottom: 6px solid #007bff;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            .loader-text {
+                margin-top: 15px;
+                font-size: 1.2em;
+                color: #fff;
+                animation: fadeIn 1.5s ease-in-out infinite;
+            }
+            @keyframes fadeIn {
+                0%, 100% { opacity: 0; }
+                50% { opacity: 1; }
+            }
+    
+            .table-responsive {
+                max-height: 400px;
+                overflow-y: auto;
+                border: 1px solid #ddd;
+                margin-top: 20px;
+                padding: 10px;
+                border-radius: 5px;
+            }
+    
+            .graph-container {
+                margin-top: 40px;
+            }
+    
+            .graph-container .row {
+                margin-bottom: 20px;
+            }
+    
+            .graph-container img {
+                max-width: 100%;
+                height: auto;
+                display: block;
+                margin: 0 auto;
+            }
+    
+            /* Hover and animation styles for graphs */
+            .graph-container img {
+                transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+    
+            .graph-container img:hover {
+                transform: scale(1.1);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            }
+    
+            .graph-container h4 {
+                transition: color 0.3s ease-in-out;
+            }
+    
+            .graph-container img:hover+h4,
+            .graph-container img:hover {
+                color: #007bff;
+            }
+    
         </style>
         
     </head>
 <body  class="light-theme">
     
-    <div class="loading text-center mt-3" id="loader">
-        <p>Loading, please wait...</p>
-        <div class="spinner-border text-primary" role="status">
-            <span class="sr-only">Loading...</span>
+    <div class="loader-container" id="loader">
+        <div>
+            <div class="loader"></div>
+            <div class="loader-text">Scraping reviews... Please wait.</div>
         </div>
     </div>
 
@@ -539,7 +614,7 @@
                       Live Scrapper
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="liveScrapDropdown">
-                      <li><a class="dropdown-item" href="#">Yelp Scrapper</a></li>
+                      <li><a class="dropdown-item" href="/foodreviews">Yelp Scrapper</a></li>
                       <li><a class="dropdown-item" href="/livescrap">Amazon Scrapper</a></li>
                       <li><a class="dropdown-item" href="/ebay_index">Ebay Scrapper</a></li>
                       <!-- <li><a class="dropdown-item" href="/scrap-help">Help</a></li> -->
@@ -870,9 +945,14 @@
 </div>
 
 <script>
-function showLoader() {
-            document.getElementById('loader').style.display = 'flex';
+        // Show the loader
+        function showLoader() {
+            document.getElementById("loader").style.display = "flex";
         }
+
+        document.querySelector("form").addEventListener("submit", function () {
+            showLoader();
+        });
 
         document.addEventListener('DOMContentLoaded', function() {
             // Hide loader once the page has fully loaded
