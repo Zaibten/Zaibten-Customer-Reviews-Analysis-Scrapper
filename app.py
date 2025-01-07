@@ -1,3 +1,4 @@
+from email.mime.image import MIMEImage
 from functools import wraps
 from bson import ObjectId
 from flask import Flask, render_template, request, redirect, url_for, session
@@ -629,96 +630,82 @@ def Yelp_scrape_reviews(url, product_name):
     driver.quit()
     return reviews_data
 
-# Function to create PDF with review analysis summary and new graphs
-def Yelpcreate_pdf(summary, reviews_df):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", "B", 16)
+# Function to generate graphs
+def generate_graphs(summary):
+    # Pie chart for sentiment distribution
+    labels = ['Positive', 'Negative', 'Neutral']
+    sizes = [summary['good_reviews'], summary['bad_reviews'], summary['neutral_reviews']]
+    colors = ['#28a745', '#e74c3c', '#f1c40f']
+    explode = (0.1, 0, 0)  # explode the first slice
 
-    # Title
-    pdf.cell(200, 10, txt="Review Analysis Report", ln=True, align="C")
-    pdf.ln(10)
+    fig, ax = plt.subplots(figsize=(6, 6))
+    ax.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
-    # Summary Information
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, txt=f"Product Name: {summary['product_name']}", ln=True)
-    pdf.cell(200, 10, txt=f"Good Reviews: {summary['good_reviews']}", ln=True)
-    pdf.cell(200, 10, txt=f"Bad Reviews: {summary['bad_reviews']}", ln=True)
-    pdf.cell(200, 10, txt=f"Neutral Reviews: {summary['neutral_reviews']}", ln=True)
-    pdf.cell(200, 10, txt=f"Recommendation: {summary['recommendation']}", ln=True)
-    pdf.ln(10)
+    # Save graph to memory
+    graph_buffer = BytesIO()
+    plt.savefig(graph_buffer, format='png')
+    graph_buffer.seek(0)
+    plt.close(fig)
+    return graph_buffer
 
-    # Plot Good vs Bad Reviews
-    plt.figure(figsize=(6, 4))
-    labels = ['Good Reviews', 'Bad Reviews']
-    values = [summary['good_reviews'], summary['bad_reviews']]
-    plt.bar(labels, values, color=['green', 'red'])
-    plt.title('Good vs Bad Reviews')
-    img_io1 = BytesIO()
-    plt.savefig(img_io1, format='png')
-    img_io1.seek(0)
-    plt.close()
-    pdf.image(img_io1, x=10, y=pdf.get_y(), w=100)
-    pdf.ln(50)
-
-    # Plot Rating Distribution
-    sentiment_counts = reviews_df['Sentiment Score'].value_counts()
-    sentiment_counts = sentiment_counts.reindex(['Positive', 'Neutral', 'Negative'], fill_value=0)  # Ensures all categories are present
-    plt.figure(figsize=(6, 4))
-    sentiment_counts.plot(kind='bar', color='skyblue')
-    plt.title('Rating Distribution')
-    plt.xlabel('Rating')
-    plt.ylabel('Count')
-    img_io2 = BytesIO()
-    plt.savefig(img_io2, format='png')
-    img_io2.seek(0)
-    plt.close()
-    pdf.image(img_io2, x=10, y=pdf.get_y(), w=100)
-    pdf.ln(50)
-
-    # Plot Review Word Count Distribution
-    word_counts = reviews_df['Comment'].apply(lambda x: len(x.split()))
-    plt.figure(figsize=(6, 4))
-    plt.hist(word_counts, bins=20, color='purple', edgecolor='black')
-    plt.title('Review Word Count Distribution')
-    plt.xlabel('Word Count')
-    plt.ylabel('Frequency')
-    img_io3 = BytesIO()
-    plt.savefig(img_io3, format='png')
-    img_io3.seek(0)
-    plt.close()
-    pdf.image(img_io3, x=10, y=pdf.get_y(), w=100)
-    pdf.ln(50)
-
-    pdf_output = BytesIO()
-    pdf.output(pdf_output)
-    pdf_output.seek(0)
-    return pdf_output
-
-# Function to send email with PDF attachment
-def Yelpsend_email(pdf_attachment, summary):
+# Function to send email
+def send_email(summary, graph_buffer):
     sender_email = "muzamilkhanofficial786@gmail.com"
     recipient_email = get_logged_in_user_email()
-    password = "iaqu xvna tpix ugkt"
+    # recipient_email = "muzamilkhanofficials@gmail.com"
+    subject = f"{summary['product_name']} - Review Sentiment Analysis Report"
 
+    # Email message
     msg = MIMEMultipart()
     msg['From'] = sender_email
     msg['To'] = recipient_email
-    msg['Subject'] = f"Review Analysis Report for {summary['product_name']}"
+    msg['Subject'] = subject
 
-    attach_part = MIMEBase('application', 'octet-stream')
-    attach_part.set_payload(pdf_attachment.read())
-    encoders.encode_base64(attach_part)
-    attach_part.add_header('Content-Disposition', 'attachment', filename="Review_Analysis.pdf")
-    msg.attach(attach_part)
+    # HTML Email Body
+    html_body = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; background-color: #f2f2f2; margin: 0; padding: 0; color: #333333;">
+        <div style="background-color: #ffffff; padding: 30px; text-align: center; border-bottom: 1px solid #ddd;">
+            <img src="cid:logo" alt="Zaibten Logo" style="border-radius: 10px; width: 120px; height: 120px;"/>
+            <h1 style="font-size: 26px; color: #333333; font-weight: 600; margin-top: 15px;">{summary['product_name']} Review Analysis</h1>
+            <p style="font-size: 18px; color: #666666; margin-top: 10px;">Here is the sentiment analysis of your product reviews.</p>
+        </div>
+        <div style="padding: 30px; background-color: #ffffff; margin: 30px auto; width: 90%; max-width: 650px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <h2 style="font-size: 22px; color: #333333; margin-bottom: 15px;">Summary</h2>
+            <p><strong>Good Reviews:</strong> <span style="color: #28a745;">{summary['good_reviews']}</span></p>
+            <p><strong>Bad Reviews:</strong> <span style="color: #e74c3c;">{summary['bad_reviews']}</span></p>
+            <p><strong>Neutral Reviews:</strong> {summary['neutral_reviews']}</p>
+            <p><strong>Recommendation:</strong> {summary['recommendation']}</p>
+        </div>
+        <div style="text-align: center; margin-top: 30px;">
+            <h2>Sentiment Distribution</h2>
+            <img src="cid:graph" alt="Sentiment Distribution Graph" style="width: 100%; max-width: 600px; border-radius: 8px;"/>
+        </div>
+    </body>
+    </html>
+    """
+    msg.attach(MIMEText(html_body, 'html'))
 
+    # Logo Attachment
+    with open("static/images/logo.png", "rb") as logo_file:
+        logo_data = logo_file.read()
+        logo = MIMEImage(logo_data, name="logo.png")
+        logo.add_header('Content-ID', '<logo>')
+        msg.attach(logo)
+
+    # Graph Attachment
+    graph_image = MIMEImage(graph_buffer.read(), name="sentiment_graph.png")
+    graph_image.add_header('Content-ID', '<graph>')
+    msg.attach(graph_image)
+
+    # SMTP Sending
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(sender_email, password)
-        server.sendmail(sender_email, recipient_email, msg.as_string())
-        server.quit()
-        print("Email sent successfully!")
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()
+            server.login(sender_email, "iaqu xvna tpix ugkt")
+            server.sendmail(sender_email, recipient_email, msg.as_string())
+            print("Email sent successfully!")
     except Exception as e:
         print(f"Failed to send email: {e}")
 
@@ -767,9 +754,11 @@ def ebay_Index():
         else:
             summary['recommendation'] = "Not Recommended"
 
-        # Generate PDF and send email
-        pdf_attachment = Yelpcreate_pdf(summary, reviews_df)
-        Yelpsend_email(pdf_attachment, summary)
+        # Generate graph
+        graph_buffer = generate_graphs(summary)
+
+        # Send email with graph
+        send_email(summary, graph_buffer)
 
     return render_template(
         'ebay_index.html',

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yelp Review Scraper</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .loader {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1050;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .loader p {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #007bff;
+        }
+
+        .table-responsive {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .graph-container {
+            margin-top: 40px;
+        }
+
+        .graph-container .row {
+            margin-bottom: 20px;
+        }
+
+        .graph-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Hover and animation styles for graphs */
+        .graph-container img {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .graph-container img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .graph-container h4 {
+            transition: color 0.3s ease-in-out;
+        }
+
+        .graph-container img:hover+h4,
+        .graph-container img:hover {
+            color: #007bff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loader" class="loader">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <p>Please wait...</p>
+    </div>
+
+    <div class="container mt-5">
+        <h1 class="text-center">Yelp Review Scraper</h1>
+        <form method="post">
+            <div class="form-group">
+                <label for="url">Enter Yelp URL:</label>
+                <input type="text" class="form-control" id="url" name="url" placeholder="https://www.yelp.com/..."
+                    required>
+            </div>
+            <button type="submit" class="btn btn-primary">Scrape Reviews</button>
+        </form>
+
+        {% if review_data %}
+        <h2 class="mt-5">Review Sentiment Analysis</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Positive Reviews:</strong> {{ positive_count }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Negative Reviews:</strong> {{ negative_count }}</p>
+            </div>
+        </div>
+
+        <h2 class="mt-3">Reviews and Sentiment</h2>
+        <div class="table-responsive">
+            {{ review_data|safe }}
+        </div>
+
+        <h2 class="mt-5">Review Sentiment Graphs</h2>
+        <div class="graph-container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4 class="text-center">Sentiment Bar Chart</h4>
+                    <img src="data:image/png;base64,{{ graphs['sentiment_bar'] }}" alt="Sentiment Bar Chart">
+                </div>
+                <div class="col-md-6">
+                    <h4 class="text-center">Sentiment Pie Chart</h4>
+                    <img src="data:image/png;base64,{{ graphs['sentiment_pie'] }}" alt="Sentiment Pie Chart">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h4 class="text-center">Sentiment Over Time Line Chart</h4>
+                    <img src="data:image/png;base64,{{ graphs['sentiment_line'] }}" alt="Sentiment Line Chart">
+                </div>
+                <div class="col-md-6">
+                    <h4 class="text-center">Word Cloud</h4>
+                    <img src="data:image/png;base64,{{ graphs['wordcloud'] }}" alt="Word Cloud">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h4 class="text-center">Review Length vs Sentiment</h4>
+                    <img src="data:image/png;base64,{{ graphs['review_length_box'] }}" alt="Review Length vs Sentiment">
+                </div>
+                <div class="col-md-6">
+                    <h4 class="text-center">Sentiment Distribution Over Review Length</h4>
+                    <img src="data:image/png;base64,{{ graphs['sentiment_length'] }}"
+                        alt="Sentiment Distribution Over Review Length">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.querySelectorAll('.graph-container img').forEach((img) => {
+            img.addEventListener('mouseover', function () {
+                this.style.cursor = 'pointer';
+            });
+
+            img.addEventListener('mouseleave', function () {
+                this.style.cursor = 'default';
+            });
+        });
+        // Show the loader
+        function showLoader() {
+            document.getElementById("loader").style.display = "block";
+        }
+
+        document.querySelector("form").addEventListener("submit", function () {
+            showLoader();
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
