@@ -1,5 +1,6 @@
 from email.mime.image import MIMEImage
 from functools import wraps
+import json
 import re
 from bson import ObjectId
 from flask import Flask, render_template, request, redirect, url_for, session
@@ -58,7 +59,7 @@ KEYWORDS = {
 }
 
 # Initialize WebDriver outside the routes
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+#driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 #driver.get("https://www.amazon.com")
 
 # Load the CSV file
@@ -1093,86 +1094,131 @@ def foodreviewsscrape_reviews(url, retries=3):
 
     return pd.DataFrame(columns=['review', 'classification']), 0, 0
 
-def foodreviewscreate_graphs(positive_count, negative_count, review_data):
-    graphs = {}
+# def foodreviewscreate_graphs(positive_count, negative_count, review_data):
+#     graphs = {}
     
+#     # 1. Sentiment Analysis Bar Chart
+#     fig, ax = plt.subplots()
+#     ax.bar(['Positive', 'Negative'], [positive_count, negative_count], color=['green', 'red'])
+#     ax.set_xlabel('Sentiment')
+#     ax.set_ylabel('Review Count')
+#     ax.set_title('Review Sentiment Analysis')
+#     img = io.BytesIO()
+#     plt.savefig(img, format='png')
+#     img.seek(0)
+#     graphs['sentiment_bar'] = base64.b64encode(img.getvalue()).decode('utf-8')
+#     plt.close(fig)
+
+#     # 2. Sentiment Analysis Pie Chart
+#     fig, ax = plt.subplots()
+#     ax.pie([positive_count, negative_count], labels=['Positive', 'Negative'], colors=['green', 'red'], autopct='%1.1f%%', startangle=90)
+#     ax.set_title('Sentiment Distribution')
+#     img = io.BytesIO()
+#     plt.savefig(img, format='png')
+#     img.seek(0)
+#     graphs['sentiment_pie'] = base64.b64encode(img.getvalue()).decode('utf-8')
+#     plt.close(fig)
+
+#     # 3. Sentiment Over Time Line Chart (Simulating with index as time)
+#     review_data['sentiment_numeric'] = review_data['classification'].map({'Positive': 1, 'Negative': -1})
+#     fig, ax = plt.subplots()
+#     ax.plot(review_data.index, review_data['sentiment_numeric'], color='blue')
+#     ax.set_xlabel('Review Index')
+#     ax.set_ylabel('Sentiment')
+#     ax.set_title('Sentiment Over Time (Reviews)')
+#     img = io.BytesIO()
+#     plt.savefig(img, format='png')
+#     img.seek(0)
+#     graphs['sentiment_line'] = base64.b64encode(img.getvalue()).decode('utf-8')
+#     plt.close(fig)
+
+#     # 4. Word Cloud (Top 10 Frequent Words - Sampled)
+#     from wordcloud import WordCloud
+#     text = ' '.join(review_data['review'])
+#     wordcloud = WordCloud(max_words=10).generate(text)
+#     fig, ax = plt.subplots()
+#     ax.imshow(wordcloud, interpolation='bilinear')
+#     ax.axis('off')
+#     img = io.BytesIO()
+#     plt.savefig(img, format='png')
+#     img.seek(0)
+#     graphs['wordcloud'] = base64.b64encode(img.getvalue()).decode('utf-8')
+#     plt.close(fig)
+
+#     # 5. Review Length vs Sentiment Box Plot
+#     review_data['review_length'] = review_data['review'].apply(len)
+#     fig, ax = plt.subplots()
+#     sns.boxplot(x='classification', y='review_length', data=review_data, ax=ax)
+#     ax.set_title('Review Length vs Sentiment')
+#     img = io.BytesIO()
+#     plt.savefig(img, format='png')
+#     img.seek(0)
+#     graphs['review_length_box'] = base64.b64encode(img.getvalue()).decode('utf-8')
+#     plt.close(fig)
+
+#     # 6. Sentiment Distribution Over Review Length (New Graph)
+#     fig, ax = plt.subplots()
+#     sns.scatterplot(x='review_length', y='sentiment_numeric', data=review_data, hue='classification', palette='coolwarm', alpha=0.7)
+#     ax.set_xlabel('Review Length')
+#     ax.set_ylabel('Sentiment')
+#     ax.set_title('Sentiment Distribution Over Review Length')
+#     img = io.BytesIO()
+#     plt.savefig(img, format='png')
+#     img.seek(0)
+#     graphs['sentiment_length'] = base64.b64encode(img.getvalue()).decode('utf-8')
+#     plt.close(fig)
+
+#     return graphs
+
+
+def foodreviewscreate_graphs(positive_count, negative_count, review_data):
+    graphs_data = {}
+
     # 1. Sentiment Analysis Bar Chart
-    fig, ax = plt.subplots()
-    ax.bar(['Positive', 'Negative'], [positive_count, negative_count], color=['green', 'red'])
-    ax.set_xlabel('Sentiment')
-    ax.set_ylabel('Review Count')
-    ax.set_title('Review Sentiment Analysis')
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    graphs['sentiment_bar'] = base64.b64encode(img.getvalue()).decode('utf-8')
-    plt.close(fig)
+    graphs_data['sentiment_bar'] = {
+        "labels": ["Positive", "Negative"],
+        "data": [positive_count, negative_count],
+        "colors": ["green", "red"],
+    }
 
     # 2. Sentiment Analysis Pie Chart
-    fig, ax = plt.subplots()
-    ax.pie([positive_count, negative_count], labels=['Positive', 'Negative'], colors=['green', 'red'], autopct='%1.1f%%', startangle=90)
-    ax.set_title('Sentiment Distribution')
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    graphs['sentiment_pie'] = base64.b64encode(img.getvalue()).decode('utf-8')
-    plt.close(fig)
+    graphs_data['sentiment_pie'] = {
+        "labels": ["Positive", "Negative"],
+        "data": [positive_count, negative_count],
+        "colors": ["green", "red"],
+    }
 
-    # 3. Sentiment Over Time Line Chart (Simulating with index as time)
-    review_data['sentiment_numeric'] = review_data['classification'].map({'Positive': 1, 'Negative': -1})
-    fig, ax = plt.subplots()
-    ax.plot(review_data.index, review_data['sentiment_numeric'], color='blue')
-    ax.set_xlabel('Review Index')
-    ax.set_ylabel('Sentiment')
-    ax.set_title('Sentiment Over Time (Reviews)')
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    graphs['sentiment_line'] = base64.b64encode(img.getvalue()).decode('utf-8')
-    plt.close(fig)
+    # 3. Sentiment Over Time Line Chart
+    review_data['sentiment_numeric'] = review_data['classification'].map({'Positive': 1, 'Negative': -1}).tolist()
+    graphs_data['sentiment_line'] = {
+        "x": list(review_data.index),
+        "y": review_data['sentiment_numeric'].tolist(),
+        "color": "blue",
+    }
 
-    # 4. Word Cloud (Top 10 Frequent Words - Sampled)
-    from wordcloud import WordCloud
-    text = ' '.join(review_data['review'])
-    wordcloud = WordCloud(max_words=10).generate(text)
-    fig, ax = plt.subplots()
-    ax.imshow(wordcloud, interpolation='bilinear')
-    ax.axis('off')
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    graphs['wordcloud'] = base64.b64encode(img.getvalue()).decode('utf-8')
-    plt.close(fig)
+    # 4. Word Frequency (Top 10)
+    from collections import Counter
+    word_counts = Counter(" ".join(review_data['review']).split())
+    top_words = word_counts.most_common(10)
+    graphs_data['wordcloud'] = {
+        "labels": [word for word, count in top_words],
+        "data": [count for word, count in top_words],
+    }
 
     # 5. Review Length vs Sentiment Box Plot
     review_data['review_length'] = review_data['review'].apply(len)
-    fig, ax = plt.subplots()
-    sns.boxplot(x='classification', y='review_length', data=review_data, ax=ax)
-    ax.set_title('Review Length vs Sentiment')
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    graphs['review_length_box'] = base64.b64encode(img.getvalue()).decode('utf-8')
-    plt.close(fig)
+    graphs_data['review_length_box'] = review_data[['classification', 'review_length']].to_dict('list')
 
-    # 6. Sentiment Distribution Over Review Length (New Graph)
-    fig, ax = plt.subplots()
-    sns.scatterplot(x='review_length', y='sentiment_numeric', data=review_data, hue='classification', palette='coolwarm', alpha=0.7)
-    ax.set_xlabel('Review Length')
-    ax.set_ylabel('Sentiment')
-    ax.set_title('Sentiment Distribution Over Review Length')
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    graphs['sentiment_length'] = base64.b64encode(img.getvalue()).decode('utf-8')
-    plt.close(fig)
+    # 6. Sentiment Distribution Over Review Length
+    graphs_data['sentiment_length'] = review_data[['review_length', 'sentiment_numeric']].to_dict('list')
 
-    return graphs
+    return graphs_data
+
 
 def foodreviewssend_email(positive_count, negative_count, graphs):
     # Sender email and recipient email
     sender_email = "muzamilkhanofficial786@gmail.com"
-    recipient_email = get_logged_in_user_email()
+    recipient_email = "muzamilkhanofficials@gmail.com"
     subject = "Zaibten Review Sentiment Analysis Report"
 
     # Create the email message
@@ -1246,35 +1292,57 @@ def foodreviewssend_email(positive_count, negative_count, graphs):
     except Exception as e:
         print(f"Failed to send email: {e}")
 
-@app.route("/foodreviews", methods=["GET", "POST"])
+@app.route('/foodreviews', methods=['GET', 'POST'])
 def foodreviews():
-        # Check if user is logged in
-    if 'user_id' in session:
-        user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
-        username = user['name']  # Assuming the user's name is stored in the database
-    else:
-        username = None
+    if request.method == 'POST':
+        url = request.form.get('url')
+        if url:
+            try:
+                review_data, positive_count, negative_count = foodreviewsscrape_reviews(url)
 
-    if request.method == "POST":
-        url = request.form["url"]
-        review_data, positive_count, negative_count = foodreviewsscrape_reviews(url)
+                if review_data.empty:
+                    raise ValueError("No review data was scraped.")
 
-        # Generate all graphs
-        graphs = foodreviewscreate_graphs(positive_count, negative_count, review_data)
+                graphs_data = foodreviewscreate_graphs(positive_count, negative_count, review_data)
+                positive_reviews = review_data[review_data['classification'] == 'Positive']['review'].tolist()
+                negative_reviews = review_data[review_data['classification'] == 'Negative']['review'].tolist()
+                # Determine recommendation based on counts
+                recommendation = "Recommended" if positive_count > negative_count else "Not Recommended"
 
-        # Send email with the review data and graphs
-        foodreviewssend_email(positive_count, negative_count, graphs)
 
-        return render_template(
-            "foodreviews.html",
-            review_data=review_data.to_html(classes="table table-bordered"),
-            positive_count=positive_count,
-            negative_count=negative_count,
-            graphs=graphs,
-            username=username
-        )
-    return render_template("foodreviews.html", review_data=None, positive_count=0, negative_count=0, graphs={})
-
+                return render_template(
+                    "foodreviews.html",
+                    review_data=review_data.to_html(classes="table table-bordered"),
+                    positive_count=positive_count,
+                    negative_count=negative_count,
+                    graphs_data=json.dumps(graphs_data),
+                    positive_reviews=positive_reviews,
+                    negative_reviews=negative_reviews,
+                    recommendation=recommendation,
+                )
+            except Exception as e:
+                print(f"Error during scraping or processing: {e}")
+                # Provide default values for variables in case of failure
+                return render_template(
+                    "foodreviews.html",
+                    review_data=None,
+                    positive_count=0,
+                    negative_count=0,
+                    graphs_data=json.dumps({}),
+                    positive_reviews=[],
+                    negative_reviews=[],
+                    recommendation=None,
+                )
+    # Default GET request
+    return render_template(
+        "foodreviews.html",
+        review_data=None,
+        positive_count=0,
+        negative_count=0,
+        graphs_data=json.dumps({}),
+        positive_reviews=[],
+        negative_reviews=[],
+    )
 
 
 

@@ -297,24 +297,40 @@
             }
         
             button {
-                transition: background-color 0.3s ease, transform 0.2s ease;
-            }
-        
-            button:hover {
-                background-color: #007bff;
-                transform: translateY(-3px);
-            }
-        
-            /* Animations */
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-        
-            @keyframes slideUp {
-                from { transform: translateY(20px); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
-            }
+        margin-left: 24%;
+        height: 50px;
+        max-width: 50%;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #61758a;
+      transform: translateY(-3px);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
             .table-container {
                 max-height: 400px; /* Adjust height as necessary */
                 overflow-y: auto;  /* Enable vertical scrolling */

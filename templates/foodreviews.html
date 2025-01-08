@@ -2,23 +2,24 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yelp Scrapper | Zaibten</title>
-    <!-- Bootstrap CSS -->
-     
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yelp Scrapper | Zaibten</title>
+  <!-- Bootstrap CSS -->
+    
+  <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
   <link rel="icon" href="static/images/logo.png" type="image/png" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <!-- Chart.js Library -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
-    <script src="https://smtpjs.com/v3/smtp.js"></script>
-      <!-- Basic -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Chart.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
+  <script src="https://smtpjs.com/v3/smtp.js"></script>
+  <!-- Basic -->
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <!-- Mobile Metas -->
@@ -31,7 +32,7 @@
 
   <!-- bootstrap core css -->
   <link rel="stylesheet" type="text/css" href="static/css/bootstrap.css" />
-  
+
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
@@ -54,425 +55,504 @@
       }
     }
   </script>
-    
-    <!-- Custom CSS -->
-    <style>
-        body {
-            background: linear-gradient(135deg, #ffffff, #f7f7f7);
-            font-family: 'Poppins', sans-serif;
-        }
-        .nav-item.dropdown:hover .dropdown-menu {
-  display: block;
-}
 
-/* Adjust dropdown positioning */
-.navbar-nav .dropdown-menu {
-  margin-top: 0;
-  border-radius: 0;
-}
+  <!-- Custom CSS -->
+  <style>
+        .table-container table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-container table th, 
+    .table-container table td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ccc;
+    }
+
+    .table-container table tr:nth-child(even) {
+        background-color: #ddd; /* Gray background for even rows */
+    }
+
+    .table-container table tr:nth-child(odd) {
+        background-color: #fff; /* White background for odd rows */
+    }
+    body {
+      background: linear-gradient(135deg, #ffffff, #f7f7f7);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .nav-item.dropdown:hover .dropdown-menu {
+      display: block;
+    }
+
+    /* Adjust dropdown positioning */
+    .navbar-nav .dropdown-menu {
+      margin-top: 0;
+      border-radius: 0;
+    }
 
     .animated-img {
-        animation: fadeIn 0.5s ease-in-out;
-        border: 1px solid #dee2e6;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        position: relative;
-        overflow: hidden;
-        cursor: pointer;
-        transition: transform 0.3s;
+      animation: fadeIn 0.5s ease-in-out;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s;
     }
 
     .animated-img:hover {
-        transform: scale(1.05);
+      transform: scale(1.05);
     }
 
     @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
+      from {
+        opacity: 0;
+      }
 
-        to {
-            opacity: 1;
-        }
+      to {
+        opacity: 1;
+      }
     }
 
     @keyframes slideIn {
-        from {
-            transform: translateY(-20px);
-            opacity: 0;
-        }
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
 
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
 
     /* Light theme */
     .light-theme {
-        background-color: #ffffffff;
-        color: #343a40;
+      background-color: #ffffffff;
+      color: #343a40;
     }
 
     .light-theme .form-control {
-        border-color: #ced4da;
+      border-color: #ced4da;
     }
 
     .light-theme .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
+      background-color: #007bff;
+      border-color: #007bff;
     }
 
     /* Dark theme */
     .dark-theme {
-        background-color: #343a40;
-        color: #f8f9fa;
+      background-color: #343a40;
+      color: #f8f9fa;
     }
 
     .dark-theme .form-control {
-        border-color: #495057;
-        background-color: #495057;
-        color: #f8f9fa;
+      border-color: #495057;
+      background-color: #495057;
+      color: #f8f9fa;
     }
 
     .dark-theme .navbar {
-        background-color: #212529;
+      background-color: #212529;
     }
 
     .form-control {
-        transition: border-color 0.3s, box-shadow 0.3s;
-        border-radius: 5px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      border-radius: 5px;
     }
 
     .btn {
-        border-radius: 5px;
-        transition: transform 0.3s, box-shadow 0.3s;
+      border-radius: 5px;
+      transition: transform 0.3s, box-shadow 0.3s;
     }
 
     .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
     }
 
     h1,
     h2 {
-        font-weight: bold;
-        color: #343a40;
-        animation: fadeIn 0.5s ease-in-out;
+      font-weight: bold;
+      color: #343a40;
+      animation: fadeIn 0.5s ease-in-out;
     }
 
     label {
-        font-weight: bold;
-        color: #495057;
+      font-weight: bold;
+      color: #495057;
     }
 
     .image-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
     }
 
     .image-container img {
-        max-width: 100%;
-        border-radius: 5px;
-        transition: transform 0.3s;
-        cursor: pointer;
+      max-width: 100%;
+      border-radius: 5px;
+      transition: transform 0.3s;
+      cursor: pointer;
     }
 
     /* Modal Styles */
     .modal .modal-content {
-        max-width: 100%;
+      max-width: 100%;
     }
 
     .modal img {
-        max-width: 100%;
-        height: auto;
-        transition: transform 0.3s; /* Add transition for smooth zoom */
+      max-width: 100%;
+      height: auto;
+      transition: transform 0.3s;
+      /* Add transition for smooth zoom */
     }
 
     .modal-body {
-        position: relative; /* Set relative positioning for absolute positioning of buttons */
+      position: relative;
+      /* Set relative positioning for absolute positioning of buttons */
     }
 
     .zoom-buttons {
-        position: absolute;
-        top: 10px; /* Adjust as needed */
-        right: 10px; /* Adjust as needed */
-        z-index: 10; /* Ensure it's above the image */
+      position: absolute;
+      top: 10px;
+      /* Adjust as needed */
+      right: 10px;
+      /* Adjust as needed */
+      z-index: 10;
+      /* Ensure it's above the image */
     }
 
     /* Footer Styles */
     .footer {
-            background-color: #111;
-            color: #bbb;
-            padding: 60px 20px;
-            text-align: center;
-        }
+      background-color: #111;
+      color: #bbb;
+      padding: 60px 20px;
+      text-align: center;
+    }
 
-        .footer-logo img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-        }
+    .footer-logo img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+    }
 
-        .footer-logo h5 {
-            margin-top: 10px;
-        }
+    .footer-logo h5 {
+      margin-top: 10px;
+    }
 
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 30px;
-        }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 30px;
+    }
 
-        .footer-links .footer-link {
-            color: #ccc;
-            font-size: 18px;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
+    .footer-links .footer-link {
+      color: #ccc;
+      font-size: 18px;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
 
-        .footer-links .footer-link:hover {
-            color: #fff;
-        }
+    .footer-links .footer-link:hover {
+      color: #fff;
+    }
 
-        .footer-social-icons {
-            margin-top: 30px;
-        }
+    .footer-social-icons {
+      margin-top: 30px;
+    }
 
-        .footer-social-icons a {
-            color: #ccc;
-            font-size: 25px;
-            margin: 0 15px;
-            transition: color 0.3s ease;
-        }
+    .footer-social-icons a {
+      color: #ccc;
+      font-size: 25px;
+      margin: 0 15px;
+      transition: color 0.3s ease;
+    }
 
-        .footer-social-icons a:hover {
-            color: #fff;
-        }
+    .footer-social-icons a:hover {
+      color: #fff;
+    }
 
-        .footer-about {
-            margin-top: 40px;
-            font-size: 16px;
-            color: #bbb;
-        }
+    .footer-about {
+      margin-top: 40px;
+      font-size: 16px;
+      color: #bbb;
+    }
 
-        .footer-about p {
-            line-height: 1.6;
-        }
+    .footer-about p {
+      line-height: 1.6;
+    }
 
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            .footer-links {
-                flex-direction: column;
-                gap: 20px;
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .footer-links {
+        flex-direction: column;
+        gap: 20px;
+      }
+    }
+
+
+    h1,
+    h2 {
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control {
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+      border-color: #2196f3;
+    }
+
+    button {
+        margin-left: 24%;
+        height: 50px;
+        max-width: 50%;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #61758a;
+      transform: translateY(-3px);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .table-container {
+      max-height: 400px;
+      /* Adjust height as necessary */
+      overflow-y: auto;
+      /* Enable vertical scrolling */
+    }
+
+    table.data th,
+    table.data td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+      animation: slideUp 0.5s ease-in-out;
+    }
+
+    .list-group-item {
+      background-color: #f8f9fa;
+      animation: slideUp 0.7s ease-in-out;
+    }
+
+    /* Scrollable review sections */
+    .scrollable-reviews {
+      max-height: 300px;
+      /* Set height to control scrolling */
+      overflow-y: auto;
+      /* Enable scrolling */
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #fff;
+    }
+
+    /* Chart container styles */
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+      margin-bottom: 30px;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #f8f9fa;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .chart-container > div {
+        height: 100%;
+        width: 100%;
+    }
+    #sentimentBarChart, #sentimentPieChart, #sentimentLineChart, #wordCloudChart {
+        height: 300px; /* Set default height */
+        width: 100%;
+    }
+
+    canvas {
+      display: block;
+      max-width: 100%;
+    }
+
+    /* Chart Legend */
+    .chartjs-legend {
+      text-align: center;
+      font-size: 14px;
+      color: #333;
+    }
+
+    /* Chart Title */
+    .chartjs-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #555;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    /* Bar colors for different charts */
+    .chart-container-bar {
+      background-color: #eaf4fe;
+      border: 2px solid #007bff;
+    }
+
+    .chart-container-pie {
+      background-color: #f4f9f9;
+      border: 2px solid #ffcc00;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      h1 {
+        font-size: 1.75rem;
+      }
+    }
+
+    .container {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      margin-top: 50px;
+      transition: transform 0.3s;
+    }
+
+    h1 {
+      color: #343a40;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .form-group label {
+      font-weight: bold;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      transition: background-color 0.3s;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+
+    .review-count {
+      margin: 10px 0;
+      padding: 15px;
+      border: 1px solid #007bff;
+      border-radius: 5px;
+      background-color: #e9f8ff;
+      color: #007bff;
+      transition: transform 0.3s;
+    }
+
+    .review-count:hover {
+      transform: scale(1.03);
+    }
+
+    .table-container {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #dee2e6;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: #fff;
+      transition: box-shadow 0.3s;
+    }
+
+    .table-container:hover {
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #6c757d;
+    }
+
+    .chart-container {
+      position: relative;
+      margin-top: 30px;
+      height: 55vh;
+      width: 100%;
+      
+      overflow: hidden; /* Hide anything that overflows */
+    }
+    .chart-container img {
+                width: 100%;    /* Make the image fill the container width */
+                height: 100%;   /* Make the image fill the container height */
+                object-fit: contain; /* Ensure aspect ratio is maintained */
             }
-        }
 
-    
-        h1, h2 {
-            animation: fadeIn 1s ease-in-out;
-        }
-    
-        h1 {
-            font-weight: 600;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-    
-        .container {
-            background-color: #fff;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-    
-        .form-control {
-            transition: all 0.3s ease;
-        }
-    
-        .form-control:focus {
-            box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
-            border-color: #2196f3;
-        }
-    
-        button {
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-    
-        button:hover {
-            background-color: #007bff;
-            transform: translateY(-3px);
-        }
-    
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-    
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .table-container {
-            max-height: 400px; /* Adjust height as necessary */
-            overflow-y: auto;  /* Enable vertical scrolling */
-        }
-    
-        table.data th, table.data td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-            animation: slideUp 0.5s ease-in-out;
-        }
-    
-        .list-group-item {
-            background-color: #f8f9fa;
-            animation: slideUp 0.7s ease-in-out;
-        }
-    
-        /* Scrollable review sections */
-        .scrollable-reviews {
-            max-height: 300px; /* Set height to control scrolling */
-            overflow-y: auto;  /* Enable scrolling */
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #fff;
-        }
-    
-        /* Chart container styles */
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-            margin-bottom: 30px;
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 8px;
-            background-color: #f8f9fa;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-    
-        canvas {
-            display: block;
-            max-width: 100%;
-        }
-    
-        /* Chart Legend */
-        .chartjs-legend {
-            text-align: center;
-            font-size: 14px;
-            color: #333;
-        }
-    
-        /* Chart Title */
-        .chartjs-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #555;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-    
-        /* Bar colors for different charts */
-        .chart-container-bar {
-            background-color: #eaf4fe;
-            border: 2px solid #007bff;
-        }
-    
-        .chart-container-pie {
-            background-color: #f4f9f9;
-            border: 2px solid #ffcc00;
-        }
-    
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-        }
-    
-        @media (max-width: 576px) {
-            h1 {
-                font-size: 1.75rem;
-            }
-        }
-        .container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            margin-top: 50px;
-            transition: transform 0.3s;
-        }
-        h1 {
-            color: #343a40;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .form-group label {
-            font-weight: bold;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            transition: background-color 0.3s;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-        .review-count {
-            margin: 10px 0;
-            padding: 15px;
-            border: 1px solid #007bff;
-            border-radius: 5px;
-            background-color: #e9f8ff;
-            color: #007bff;
-            transition: transform 0.3s;
-        }
-        .review-count:hover {
-            transform: scale(1.03);
-        }
-        .table-container {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #dee2e6;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #fff;
-            transition: box-shadow 0.3s;
-        }
-        .table-container:hover {
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: #6c757d;
-        }
-        .chart-container {
-            position: relative;
-            margin-top: 30px;
-            height: 40vh;
-            width: 100%;
-        }
-        
-        .spinner-border {
-            width: 3rem;
-            height: 3rem;
-            color: #007bff;
-        }
-        .scrollable-comments {
-    max-height: 300px; /* Set the height you want */
-    overflow-y: auto; /* Enable vertical scrolling */
-    border: 1px solid #ccc; /* Optional: add a border for better visibility */
-    padding: 10px; /* Optional: add padding */
-    border-radius: 5px; /* Optional: round the corners */
-}
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+      color: #007bff;
+    }
+
+    .scrollable-comments {
+      max-height: 300px;
+      /* Set the height you want */
+      overflow-y: auto;
+      /* Enable vertical scrolling */
+      border: 1px solid #ccc;
+      /* Optional: add a border for better visibility */
+      padding: 10px;
+      /* Optional: add padding */
+      border-radius: 5px;
+      /* Optional: round the corners */
+    }
 
 
 
@@ -491,436 +571,577 @@
 
 
 
- /* Loader Styles */
- .loader-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7); /* Semi-transparent dark overlay */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            display: none; /* Hidden by default */
-        }
-        .loader {
-            width: 50px;
-            height: 50px;
-            border: 6px solid transparent;
-            border-top: 6px solid #007bff;
-            border-bottom: 6px solid #007bff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .loader-text {
-            margin-top: 15px;
-            font-size: 1.2em;
-            color: #fff;
-            animation: fadeIn 1.5s ease-in-out infinite;
-        }
-        @keyframes fadeIn {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
-        }
+    /* Loader Styles */
+    .loader-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      /* Semi-transparent dark overlay */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      display: none;
+      /* Hidden by default */
+    }
 
-        .table-responsive {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
-        }
+    .loader {
+      width: 50px;
+      height: 50px;
+      border: 6px solid transparent;
+      border-top: 6px solid #007bff;
+      border-bottom: 6px solid #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
 
-        .graph-container {
-            margin-top: 40px;
-        }
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
 
-        .graph-container .row {
-            margin-bottom: 20px;
-        }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
 
-        .graph-container img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 0 auto;
-        }
+    .loader-text {
+      margin-top: 15px;
+      font-size: 1.2em;
+      color: #fff;
+      animation: fadeIn 1.5s ease-in-out infinite;
+    }
 
-        /* Hover and animation styles for graphs */
-        .graph-container img {
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+    @keyframes fadeIn {
 
-        .graph-container img:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
+      0%,
+      100% {
+        opacity: 0;
+      }
 
-        .graph-container h4 {
-            transition: color 0.3s ease-in-out;
-        }
+      50% {
+        opacity: 1;
+      }
+    }
 
-        .graph-container img:hover+h4,
-        .graph-container img:hover {
-            color: #007bff;
-        }
+    .table-responsive {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 5px;
+    }
 
-    </style>
-    
+    .graph-container {
+      margin-top: 40px;
+    }
+
+    .graph-container .row {
+      margin-bottom: 20px;
+    }
+
+    .graph-container img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* Hover and animation styles for graphs */
+    .graph-container img {
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .graph-container img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .graph-container h4 {
+      transition: color 0.3s ease-in-out;
+    }
+
+    .graph-container img:hover+h4,
+    .graph-container img:hover {
+      color: #007bff;
+    }
+  </style>
+
 </head>
 
-<body  class="light-theme">
-    <div class="loader-container" id="loader">
-        <div>
-            <div class="loader"></div>
-            <div class="loader-text">Scraping reviews... Please wait.</div>
-        </div>
+<body class="light-theme">
+  <div class="loader-container" id="loader">
+    <div>
+      <div class="loader"></div>
+      <div class="loader-text">Scraping reviews... Please wait.</div>
     </div>
+  </div>
 
-    <div class="hero_area">
-        <header class="header_section long_section px-0">
-          <nav class="navbar navbar-expand-lg custom_nav-container ">
-            <a class="navbar-brand" href="/">
-              <span>
-                Z A I B T E N
-              </span>
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-              aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-              <span class=""> </span>
-            </button>
-    
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-              <div class="d-flex mx-auto flex-column flex-lg-row align-items-center">
-                <ul class="navbar-nav">
-                  <li class="nav-item active">
-                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/reviews">Review Analysis</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/about">About Us</a>
-                  </li>
-                  <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="/livescrap" id="liveScrapDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Live Scrapper
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="liveScrapDropdown">
-                      <li><a class="dropdown-item" href="/foodreviews">Yelp Scrapper</a></li>
-                      <li><a class="dropdown-item" href="/livescrap">Amazon Scrapper</a></li>
-                      <li><a class="dropdown-item" href="/ebay_index">Ebay Scrapper</a></li>
-                      <!-- <li><a class="dropdown-item" href="/scrap-help">Help</a></li> -->
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/contact">Contact Us</a>
-                  </li>
+  <div class="hero_area">
+    <header class="header_section long_section px-0">
+      <nav class="navbar navbar-expand-lg custom_nav-container ">
+        <a class="navbar-brand" href="/">
+          <span>
+            Z A I B T E N
+          </span>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class=""> </span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <div class="d-flex mx-auto flex-column flex-lg-row align-items-center">
+            <ul class="navbar-nav">
+              <li class="nav-item active">
+                <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/reviews">Review Analysis</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/about">About Us</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="/livescrap" id="liveScrapDropdown" role="button"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+                  Live Scrapper
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="liveScrapDropdown">
+                  <li><a class="dropdown-item" href="/foodreviews">Yelp Scrapper</a></li>
+                  <li><a class="dropdown-item" href="/livescrap">Amazon Scrapper</a></li>
+                  <li><a class="dropdown-item" href="/ebay_index">Ebay Scrapper</a></li>
+                  <!-- <li><a class="dropdown-item" href="/scrap-help">Help</a></li> -->
                 </ul>
-              </div>
-              
-              <div class="quote_btn-container">
-                {% if username %}
-                  <a href="#">
-                    <span>{{ username }}</span>
-                    <i class="fa fa-user" aria-hidden="true"></i>
-                  </a>
-                  <!-- Trigger confirmLogout function when the user clicks on logout -->
-                  <a href="javascript:void(0);" onclick="confirmLogout()" class="ml-3">
-                    <span>Logout</span>
-                    <i class="fa fa-sign-out" aria-hidden="true"></i>
-                  </a>
-                {% else %}
-                  <a href="/login">
-                    <span>Login</span>
-                    <i class="fa fa-user" aria-hidden="true"></i>
-                  </a>
-                {% endif %}
-                <form class="form-inline">
-                  <button class="btn my-2 my-sm-0 nav_search-btn" type="submit">
-                    <i class="fa fa-search" aria-hidden="true"></i>
-                  </button>
-                </form>
-              </div>
-            </div>
-          </nav>
-        </header>
-    
-      
-      <!-- Full Page Image Background Carousel Header -->
-      <div id="myCarousel" class="carousel slide">
-            <!-- Indicators -->
-            <ol class="carousel-indicators">
-                <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-                <li data-target="#myCarousel" data-slide-to="1"></li>
-                <li data-target="#myCarousel" data-slide-to="2"></li>
-            </ol>
-    
-            <!-- Wrapper for Slides -->
-            <div class="carousel-inner">
-                <div class="item active">
-                    <!-- Set the first background image using inline CSS below. -->
-                    <div class="fill" style="background-image:url('http://www.marchettidesign.net/demo/optimized-bootstrap/code.jpg');"></div>
-                    <div class="carousel-caption">
-                         <h2 class="animated fadeInLeft">Caption Animation</h2>
-                         <p class="animated fadeInUp">Lorem ipsum dolor sit amet consectetur adipisicing elit</p>
-                         <p class="animated fadeInUp"><a href="#" class="btn btn-transparent btn-rounded btn-large">Learn More</a></p>
-                    </div>
-                </div>
-                <div class="item">
-                    <!-- Set the second background image using inline CSS below. -->
-                    <div class="fill" style="background-image:url('http://www.marchettidesign.net/demo/optimized-bootstrap/conference.jpg');"></div>
-                    <div class="carousel-caption">
-                         <h2 class="animated fadeInDown">Caption Animation</h2>
-                         <p class="animated fadeInUp">Lorem ipsum dolor sit amet consectetur adipisicing elit</p>
-                         <p class="animated fadeInUp"><a href="#" class="btn btn-transparent btn-rounded btn-large">Learn More</a></p>
-                    </div>
-                </div>
-                <div class="item">
-                    <!-- Set the third background image using inline CSS below. -->
-                    <div class="fill" style="background-image:url('http://www.marchettidesign.net/demo/optimized-bootstrap/campus.jpg');"></div>
-                    <div class="carousel-caption">
-                         <h2 class="animated fadeInRight">Caption Animation</h2>
-                         <p class="animated fadeInRight">Lorem ipsum dolor sit amet consectetur adipisicing elit</p>
-                         <p class="animated fadeInRight"><a href="#" class="btn btn-transparent btn-rounded btn-large">Learn More</a></p>
-                    </div>
-                </div>
-            </div>
-    
-            <!-- Controls -->
-            <a class="left carousel-control" href="#myCarousel" data-slide="prev">
-                <span class="icon-prev"></span>
-            </a>
-            <a class="right carousel-control" href="#myCarousel" data-slide="next">
-                <span class="icon-next"></span>
-            </a>
-    
-        </div>
-        <!-- end header section -->
-        <!-- slider section -->
-        <section class="slider_section long_section">
-          <div id="customCarousel" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner">
-              <div class="carousel-item active">
-                <div class="container ">
-                  <div class="row">
-                    <div class="col-md-5">
-                      <div class="detail-box">
-                        <h1>
-                          For All Your <br>
-                          Reviews Needs
-                        </h1>
-                        <p>
-                          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus quidem maiores perspiciatis, illo maxime voluptatem a itaque suscipit.
-                        </p>
-                        <div class="btn-box">
-                          <a href="" class="btn1">
-                            Contact Us
-                          </a>
-                          <a href="" class="btn2">
-                            About Us
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-7">
-                      <div class="img-box">
-                        <img src="static/images/slider-img.png" alt="">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="carousel-item">
-                <div class="container ">
-                  <div class="row">
-                    <div class="col-md-5">
-                      <div class="detail-box">
-                        <h1>
-                          For All Your <br>
-                          Reviews Needs
-                        </h1>
-                        <p>
-                          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus quidem maiores perspiciatis, illo maxime voluptatem a itaque suscipit.
-                        </p>
-                        <div class="btn-box">
-                          <a href="" class="btn1">
-                            Contact Us
-                          </a>
-                          <a href="" class="btn2">
-                            About Us
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-7">
-                      <div class="img-box">
-                        <img src="static/images/slider-img.png" alt="">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="carousel-item">
-                <div class="container ">
-                  <div class="row">
-                    <div class="col-md-5">
-                      <div class="detail-box">
-                        <h1>
-                          For All Your <br>
-                          Reviews Needs
-                        </h1>
-                        <p>
-                          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus quidem maiores perspiciatis, illo maxime voluptatem a itaque suscipit.
-                        </p>
-                        <div class="btn-box">
-                          <a href="" class="btn1">
-                            Contact Us
-                          </a>
-                          <a href="" class="btn2">
-                            About Us
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-7">
-                      <div class="img-box">
-                        <img src="static/images/slider-img.png" alt="">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <ol class="carousel-indicators">
-              <li data-target="#customCarousel" data-slide-to="0" class="active"></li>
-              <li data-target="#customCarousel" data-slide-to="1"></li>
-              <li data-target="#customCarousel" data-slide-to="2"></li>
-            </ol>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/contact">Contact Us</a>
+              </li>
+            </ul>
           </div>
-        </section>
-        <!-- end slider section -->
+
+          <div class="quote_btn-container">
+            {% if username %}
+            <a href="#">
+              <span>{{ username }}</span>
+              <i class="fa fa-user" aria-hidden="true"></i>
+            </a>
+            <!-- Trigger confirmLogout function when the user clicks on logout -->
+            <a href="javascript:void(0);" onclick="confirmLogout()" class="ml-3">
+              <span>Logout</span>
+              <i class="fa fa-sign-out" aria-hidden="true"></i>
+            </a>
+            {% else %}
+            <a href="/login">
+              <span>Login</span>
+              <i class="fa fa-user" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+            <form class="form-inline">
+              <button class="btn my-2 my-sm-0 nav_search-btn" type="submit">
+                <i class="fa fa-search" aria-hidden="true"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+
+    <!-- Full Page Image Background Carousel Header -->
+    <div id="myCarousel" class="carousel slide">
+      <!-- Indicators -->
+      <ol class="carousel-indicators">
+        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+        <li data-target="#myCarousel" data-slide-to="1"></li>
+        <li data-target="#myCarousel" data-slide-to="2"></li>
+      </ol>
+
+      <!-- Wrapper for Slides -->
+      <div class="carousel-inner">
+        <div class="item active">
+          <!-- Set the first background image using inline CSS below. -->
+          <div class="fill"
+            style="background-image:url('http://www.marchettidesign.net/demo/optimized-bootstrap/code.jpg');"></div>
+          <div class="carousel-caption">
+            <h2 class="animated fadeInLeft">Caption Animation</h2>
+            <p class="animated fadeInUp">Lorem ipsum dolor sit amet consectetur adipisicing elit</p>
+            <p class="animated fadeInUp"><a href="#" class="btn btn-transparent btn-rounded btn-large">Learn More</a>
+            </p>
+          </div>
+        </div>
+        <div class="item">
+          <!-- Set the second background image using inline CSS below. -->
+          <div class="fill"
+            style="background-image:url('http://www.marchettidesign.net/demo/optimized-bootstrap/conference.jpg');">
+          </div>
+          <div class="carousel-caption">
+            <h2 class="animated fadeInDown">Caption Animation</h2>
+            <p class="animated fadeInUp">Lorem ipsum dolor sit amet consectetur adipisicing elit</p>
+            <p class="animated fadeInUp"><a href="#" class="btn btn-transparent btn-rounded btn-large">Learn More</a>
+            </p>
+          </div>
+        </div>
+        <div class="item">
+          <!-- Set the third background image using inline CSS below. -->
+          <div class="fill"
+            style="background-image:url('http://www.marchettidesign.net/demo/optimized-bootstrap/campus.jpg');"></div>
+          <div class="carousel-caption">
+            <h2 class="animated fadeInRight">Caption Animation</h2>
+            <p class="animated fadeInRight">Lorem ipsum dolor sit amet consectetur adipisicing elit</p>
+            <p class="animated fadeInRight"><a href="#" class="btn btn-transparent btn-rounded btn-large">Learn More</a>
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div class="container mt-5" id="scroll_container">
-        <h1 class="text-center">Yelp Review Scraper</h1>
-        <form method="POST" onsubmit="showLoader()">
-            <div class="form-group">
-                <label for="url">Enter Yelp URL:</label>
-                <input type="text" class="form-control" id="url" name="url" placeholder="https://www.yelp.com/..."
-                    required>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Scrape Reviews</button>
-        </form>
+      <!-- Controls -->
+      <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+        <span class="icon-prev"></span>
+      </a>
+      <a class="right carousel-control" href="#myCarousel" data-slide="next">
+        <span class="icon-next"></span>
+      </a>
 
-        {% if review_data %}
-        <div class="mt-5">
-            <h3>Review Summary</h3>
-            <div class="review-count">
-                <strong>Good Reviews:</strong> <span id="good-reviews">{{ positive_count }}</span>
+    </div>
+    <!-- end header section -->
+    <!-- slider section -->
+    <section class="slider_section long_section">
+      <div id="customCarousel" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <div class="container ">
+              <div class="row">
+                <div class="col-md-5">
+                  <div class="detail-box">
+                    <h1>
+                      For All Your <br>
+                      Reviews Needs
+                    </h1>
+                    <p>
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus quidem maiores perspiciatis, illo
+                      maxime voluptatem a itaque suscipit.
+                    </p>
+                    <div class="btn-box">
+                      <a href="" class="btn1">
+                        Contact Us
+                      </a>
+                      <a href="" class="btn2">
+                        About Us
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-7">
+                  <div class="img-box">
+                    <img src="static/images/slider-img.png" alt="">
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="review-count">
-                <strong>Bad Reviews:</strong> <span id="bad-reviews">{{ negative_count }}</span>
+          </div>
+          <div class="carousel-item">
+            <div class="container ">
+              <div class="row">
+                <div class="col-md-5">
+                  <div class="detail-box">
+                    <h1>
+                      For All Your <br>
+                      Reviews Needs
+                    </h1>
+                    <p>
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus quidem maiores perspiciatis, illo
+                      maxime voluptatem a itaque suscipit.
+                    </p>
+                    <div class="btn-box">
+                      <a href="" class="btn1">
+                        Contact Us
+                      </a>
+                      <a href="" class="btn2">
+                        About Us
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-7">
+                  <div class="img-box">
+                    <img src="static/images/slider-img.png" alt="">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <div class="container ">
+              <div class="row">
+                <div class="col-md-5">
+                  <div class="detail-box">
+                    <h1>
+                      For All Your <br>
+                      Reviews Needs
+                    </h1>
+                    <p>
+                      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus quidem maiores perspiciatis, illo
+                      maxime voluptatem a itaque suscipit.
+                    </p>
+                    <div class="btn-box">
+                      <a href="" class="btn1">
+                        Contact Us
+                      </a>
+                      <a href="" class="btn2">
+                        About Us
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-7">
+                  <div class="img-box">
+                    <img src="static/images/slider-img.png" alt="">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ol class="carousel-indicators">
+          <li data-target="#customCarousel" data-slide-to="0" class="active"></li>
+          <li data-target="#customCarousel" data-slide-to="1"></li>
+          <li data-target="#customCarousel" data-slide-to="2"></li>
+        </ol>
+      </div>
+    </section>
+    <!-- end slider section -->
+  </div>
+
+  <div class="container mt-5" id="scroll_container">
+    <h1 class="text-center">Yelp Product Review Scrapper</h1>
+    <form method="POST" onsubmit="showLoader()">
+        <div class="form-group">
+          <label for="url">Enter Yelp URL:</label>
+          <input type="text" class="form-control" id="url" name="url" placeholder="https://www.yelp.com/..." required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Scrape Reviews</button>
+      </form>  
+      {% if review_data %}
+    <div class="mt-5">
+        <h3>Review Summary</h3>
+
+        <div class="mt-3">
+            <h4>Review Counts</h4>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="review-count">
+                        <strong>Good Reviews:</strong> <span id="good-reviews">{{ positive_count }}</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="review-count">
+                        <strong>Bad Reviews:</strong> <span id="bad-reviews">{{ negative_count }}</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="review-count">
+                        <strong>Neutral Reviews:</strong> <span id="bad-reviews">0</span>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- New Div for Positive Comments Display -->
+        <div class="mt-5">
+            <h3>Positive Comments</h3>
+            <div class="scrollable-comments" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                <ul class="list-group">
+                    {% for review in positive_reviews %}
+                        <li class="list-group-item">
+                            <p>{{ review }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- New Div for Negative Comments Display -->
+        <div class="mt-5">
+            <h3>Negative Comments</h3>
+            <div class="scrollable-comments" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                <ul class="list-group">
+                    {% for review in negative_reviews %}
+                        <li class="list-group-item">
+                            <p>{{ review }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+<br><br>
+        <h4><strong>Recommendation: </strong>{{ recommendation }}</h4>
+
+        <!-- Display the Scraped Reviews Table -->
         <div class="mt-5">
             <h3>Scraped Reviews</h3>
             <div class="table-container">
                 {{ review_data|safe }}
             </div>
         </div>
+        <br><br>
 
-        <h2 class="mt-5">Review Sentiment Graphs</h2>
-        <div class="graph-container">
+        <!-- Display the Charts -->
+        <div class="mt-5">
+            <h3>Charts</h3>
             <div class="row">
                 <div class="col-md-6">
-                    <h4 class="text-center">Sentiment Bar Chart</h4>
-                    <img src="data:image/png;base64,{{ graphs['sentiment_bar'] }}" alt="Sentiment Bar Chart">
+                    <div class="chart-container">
+                        <div id="sentimentBarChart" style="height: 300px; width: 100%;"></div>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <h4 class="text-center">Sentiment Pie Chart</h4>
-                    <img src="data:image/png;base64,{{ graphs['sentiment_pie'] }}" alt="Sentiment Pie Chart">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <h4 class="text-center">Sentiment Over Time Line Chart</h4>
-                    <img src="data:image/png;base64,{{ graphs['sentiment_line'] }}" alt="Sentiment Line Chart">
+                    <div class="chart-container">
+                        <div id="sentimentPieChart" style="height: 300px; width: 100%;"></div>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <h4 class="text-center">Word Cloud</h4>
-                    <img src="data:image/png;base64,{{ graphs['wordcloud'] }}" alt="Word Cloud">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <h4 class="text-center">Review Length vs Sentiment</h4>
-                    <img src="data:image/png;base64,{{ graphs['review_length_box'] }}" alt="Review Length vs Sentiment">
+                    <div class="chart-container">
+                        <div id="sentimentLineChart" style="height: 300px; width: 100%;"></div>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <h4 class="text-center">Sentiment Distribution Over Review Length</h4>
-                    <img src="data:image/png;base64,{{ graphs['sentiment_length'] }}"
-                        alt="Sentiment Distribution Over Review Length">
+                    <div class="chart-container">
+                        <div id="wordCloudChart" style="height: 300px; width: 100%;"></div>
+                    </div>
                 </div>
             </div>
         </div>
-        {% endif %}
+        
+
+        
     </div>
-    <br><br>
-    
-<!-- Footer -->
-<div class="footer">
+    {% endif %}
+</div>
+  <br><br>
+
+  <!-- Footer -->
+  <div class="footer">
     <div class="footer-logo">
-        <img src="../static/images/logo.png" alt="Logo">
-        <h5>Z A I B T E N</h5>
+      <img src="../static/images/logo.png" alt="Logo">
+      <h5>Z A I B T E N</h5>
     </div>
     <div class="footer-links">
-        <a href="#" class="footer-link">Home</a>
-        <a href="#" class="footer-link">About</a>
-        <a href="#" class="footer-link">Services</a>
-        <a href="#" class="footer-link">Blog</a>
-        <a href="#" class="footer-link">Contact</a>
+      <a href="#" class="footer-link">Home</a>
+      <a href="#" class="footer-link">About</a>
+      <a href="#" class="footer-link">Services</a>
+      <a href="#" class="footer-link">Blog</a>
+      <a href="#" class="footer-link">Contact</a>
     </div>
     <div class="footer-social-icons">
-        <a href="#" class="fab fa-facebook-f"></a>
-        <a href="#" class="fab fa-twitter"></a>
-        <a href="#" class="fab fa-linkedin-in"></a>
-        <a href="#" class="fab fa-instagram"></a>
+      <a href="#" class="fab fa-facebook-f"></a>
+      <a href="#" class="fab fa-twitter"></a>
+      <a href="#" class="fab fa-linkedin-in"></a>
+      <a href="#" class="fab fa-instagram"></a>
     </div>
     <div class="footer-about">
-        <p>MyApp is a platform that provides reliable customer reviews and analysis to help you make the best buying decisions. With a focus on transparency and authenticity, we aim to be the most trusted review platform.</p>
-        <p>For more information, feel free to contact us via our contact page or visit our FAQ section for any inquiries.</p>
+      <p>MyApp is a platform that provides reliable customer reviews and analysis to help you make the best buying
+        decisions. With a focus on transparency and authenticity, we aim to be the most trusted review platform.</p>
+      <p>For more information, feel free to contact us via our contact page or visit our FAQ section for any inquiries.
+      </p>
     </div>
-</div>
+  </div>
+  <script>
+    document.querySelectorAll('.graph-container img').forEach((img) => {
+      img.addEventListener('mouseover', function () {
+        this.style.cursor = 'pointer';
+      });
 
-    <script>
-        document.querySelectorAll('.graph-container img').forEach((img) => {
-            img.addEventListener('mouseover', function () {
-                this.style.cursor = 'pointer';
-            });
+      img.addEventListener('mouseleave', function () {
+        this.style.cursor = 'default';
+      });
+    });
+    // Show the loader
+    function showLoader() {
+      document.getElementById("loader").style.display = "flex";
+    }
 
-            img.addEventListener('mouseleave', function () {
-                this.style.cursor = 'default';
-            });
+    document.querySelector("form").addEventListener("submit", function () {
+      showLoader();
+    });
+
+    window.onload = function () {
+    const scrollPosition = sessionStorage.getItem('scrollPosition');
+    if (scrollPosition) {
+        window.scrollTo({
+            top: parseInt(scrollPosition),
+            behavior: 'smooth' // Add smooth scrolling behavior
         });
-        // Show the loader
-        function showLoader() {
-            document.getElementById("loader").style.display = "flex";
-        }
+    } else {
+        scrollToElement(); // Scroll to the container smoothly
+    }
+};
 
-        document.querySelector("form").addEventListener("submit", function () {
-            showLoader();
+function scrollToElement() {
+    document.getElementById('scroll_container').scrollIntoView({
+        behavior: 'smooth', // Smooth scrolling
+        block: 'start'      // Align to the top of the div
+    });
+}
+  </script>
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+<script>
+    const graphs = JSON.parse('{{ graphs_data | safe }}');
+
+    // Common chart rendering options
+    const renderChart = (chartId, chartType, dataPoints, title = "") => {
+        const chart = new CanvasJS.Chart(chartId, {
+            animationEnabled: true,
+            // title: { text: title },
+            data: [{
+                type: chartType,
+                dataPoints: dataPoints
+            }]
         });
-    </script>
+        chart.render();
+    };
+
+    // Prepare Data Points
+    const sentimentBarData = graphs.sentiment_bar.labels.map((label, i) => ({
+        label,
+        y: graphs.sentiment_bar.data[i],
+        color: graphs.sentiment_bar.colors[i]
+    }));
+
+    const sentimentPieData = graphs.sentiment_pie.labels.map((label, i) => ({
+        label,
+        y: graphs.sentiment_pie.data[i],
+        color: graphs.sentiment_pie.colors[i]
+    }));
+
+    const sentimentLineData = graphs.sentiment_line.x.map((x, i) => ({
+        x: x,
+        y: graphs.sentiment_line.y[i]
+    }));
+
+    const wordCloudData = graphs.wordcloud.labels.map((label, i) => ({
+        label,
+        y: graphs.wordcloud.data[i]
+    }));
+
+    // Render Charts
+    renderChart("sentimentBarChart", "column", sentimentBarData, "Review Sentiment Analysis");
+    renderChart("sentimentPieChart", "pie", sentimentPieData, "Sentiment Distribution");
+    renderChart("sentimentLineChart", "line", sentimentLineData, "Sentiment Over Time");
+    renderChart("wordCloudChart", "bar", wordCloudData, "Top 10 Words in Reviews");
+</script>
+
+
+
+
+
 </body>
 
 </html>
