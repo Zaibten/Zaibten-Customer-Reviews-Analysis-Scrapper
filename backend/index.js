@@ -283,7 +283,7 @@ app.get('/home', async (req, res) => {
     <tr>
       <td>${user.name}</td>
       <td>${user.email}</td>
-      <td>${user.password}</td>
+      <td>******</td>
     </tr>
   `).join('');
 
