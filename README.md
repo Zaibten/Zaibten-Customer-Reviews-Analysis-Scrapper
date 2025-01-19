@@ -83,5 +83,9 @@ Join ZAIBTEN SCRAPPER today and unlock the power of web scraping, customer revie
 ![image](https://github.com/user-attachments/assets/4240c198-9a3a-47e5-9fb4-a24087ebe8ef)
 ![image](https://github.com/user-attachments/assets/ac2ca90b-4fe0-49c9-8bfd-71a54f818772)
 ![image](https://github.com/user-attachments/assets/d1cd8841-77b9-4cda-9a31-205032977bae)
-![image](https://github.com/user-attachments/assets/d985893a-7a58-469f-96a6-7b029f213ad2)
+![image](https://github.com/user-attachments/assets/d7bc6e5b-55aa-4a58-9637-87686a30833f)
+![image](https://github.com/user-attachments/assets/633398a8-3d49-45da-bc27-102315cff590)
+![image](https://github.com/user-attachments/assets/5e80c275-10ad-4e39-a68f-0707dd24dcca)
+![image](https://github.com/user-attachments/assets/86bde28c-71ae-4dbd-8ba8-3ceed7e89091)
+
 
