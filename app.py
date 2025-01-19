@@ -3,7 +3,7 @@ from functools import wraps
 import json
 import re
 from bson import ObjectId
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, flash, render_template, request, redirect, url_for, session
 import pandas as pd
 import requests
 from transformers import pipeline
@@ -589,50 +589,101 @@ def Yelp_get_sentiment_score(comment):
     else:
         return "Neutral"
 
-# Function to scrape reviews data
+
 def Yelp_scrape_reviews(url, product_name):
     driver = webdriver.Chrome()
     driver.get(url)
-    time.sleep(3)
+    time.sleep(3)  # Allow the page to load
     reviews_data = []
 
     while True:
-        reviews_section = driver.find_elements(By.CSS_SELECTOR, "li.fdbk-container")
-        for review in reviews_section:
-            try:
-                username = review.find_element(By.CSS_SELECTOR, "div.fdbk-container__details__info__username span").text
-                date = review.find_element(By.CSS_SELECTOR, "span.fdbk-container__details__info__divide__time span").text
-                comment = review.find_element(By.CSS_SELECTOR, "div.fdbk-container__details__comment span").text.strip()
-                if not comment:
-                    continue
-                feedback_type_icon = review.find_element(By.CSS_SELECTOR, "div.fdbk-container__details__info__icon svg")
-                feedback_type = feedback_type_icon.get_attribute("data-test-type")
-
-                sentiment_score = Yelp_get_sentiment_score(comment)
-
-                reviews_data.append({
-                    "Product Name": product_name,
-                    "Username": username,
-                    "Date": date,
-                    "Comment": comment,
-                    "Feedback Type": feedback_type,
-                    "Sentiment Score": feedback_type,
-                })
-            except Exception as e:
-                print("An error occurred:", e)
-
         try:
-            next_button = driver.find_element(By.CSS_SELECTOR, "a.pagination__next")
-            next_href = next_button.get_attribute("href")
-            driver.execute_script("arguments[0].click();", next_button)
-            time.sleep(3)
-            if next_button.get_attribute("href") == next_href:
+            # Locate all reviews on the current page
+            reviews_section = driver.find_elements(By.CSS_SELECTOR, "li.fdbk-container")
+            for review in reviews_section:
+                try:
+                    username = review.find_element(By.CSS_SELECTOR, "div.fdbk-container__details__info__username span").text
+                    date = review.find_element(By.CSS_SELECTOR, "span.fdbk-container__details__info__divide__time span").text
+                    comment = review.find_element(By.CSS_SELECTOR, "div.fdbk-container__details__comment span").text.strip()
+                    if not comment:
+                        continue
+                    feedback_type_icon = review.find_element(By.CSS_SELECTOR, "div.fdbk-container__details__info__icon svg")
+                    feedback_type = feedback_type_icon.get_attribute("data-test-type")
+
+                    sentiment_score = Yelp_get_sentiment_score(comment)
+
+                    reviews_data.append({
+                        "Product Name": product_name,
+                        "Username": username,
+                        "Date": date,
+                        "Comment": comment,
+                        "Feedback Type": feedback_type,
+                        "Sentiment Score": sentiment_score
+                    })
+                except Exception as e:
+                    print("Error processing review:", e)
+
+            # Check for the "Next" button and navigate to the next page
+            next_button = driver.find_elements(By.CSS_SELECTOR, "a.pagination__next")
+            if next_button and "disabled" not in next_button[0].get_attribute("class"):
+                next_button[0].click()
+                time.sleep(3)  # Allow the next page to load
+            else:
+                print("No more pages to scrape.")
                 break
-        except:
+        except Exception as e:
+            print("An error occurred during pagination:", e)
             break
 
+    # Close the browser
     driver.quit()
     return reviews_data
+
+
+# Function to scrape reviews data
+# def Yelp_scrape_reviews(url, product_name):
+#     driver = webdriver.Chrome()
+#     driver.get(url)
+#     time.sleep(3)
+#     reviews_data = []
+
+#     while True:
+#         reviews_section = driver.find_elements(By.CSS_SELECTOR, "li.fdbk-container")
+#         for review in reviews_section:
+#             try:
+#                 username = review.find_element(By.CSS_SELECTOR, "div.fdbk-container__details__info__username span").text
+#                 date = review.find_element(By.CSS_SELECTOR, "span.fdbk-container__details__info__divide__time span").text
+#                 comment = review.find_element(By.CSS_SELECTOR, "div.fdbk-container__details__comment span").text.strip()
+#                 if not comment:
+#                     continue
+#                 feedback_type_icon = review.find_element(By.CSS_SELECTOR, "div.fdbk-container__details__info__icon svg")
+#                 feedback_type = feedback_type_icon.get_attribute("data-test-type")
+
+#                 sentiment_score = Yelp_get_sentiment_score(comment)
+
+#                 reviews_data.append({
+#                     "Product Name": product_name,
+#                     "Username": username,
+#                     "Date": date,
+#                     "Comment": comment,
+#                     "Feedback Type": feedback_type,
+#                     "Sentiment Score": feedback_type,
+#                 })
+#             except Exception as e:
+#                 print("An error occurred:", e)
+
+#         try:
+#             next_button = driver.find_element(By.CSS_SELECTOR, "a.pagination__next")
+#             next_href = next_button.get_attribute("href")
+#             driver.execute_script("arguments[0].click();", next_button)
+#             time.sleep(3)
+#             if next_button.get_attribute("href") == next_href:
+#                 break
+#         except:
+#             break
+
+#     driver.quit()
+#     return reviews_data
 
 # Function to generate graphs
 def generate_graphs(summary):
@@ -1064,35 +1115,6 @@ def foodreviewssentiment_score(review):
     else:
         return "Neutral"
 
-def foodreviewsscrape_reviews(url, retries=3):
-    for attempt in range(retries):
-        try:
-            r = requests.get(url, timeout=10)
-            r.raise_for_status()
-            soup = BeautifulSoup(r.text, 'html.parser')
-
-            regex = re.compile('.*comment.*')
-            results = soup.find_all('p', {'class': regex}) or soup.find_all('p')
-            reviews = [result.get_text(strip=True) for result in results if result.get_text(strip=True)]
-
-            if not reviews:
-                raise ValueError("No reviews found. Retrying...")
-
-            review_data = pd.DataFrame({'review': reviews})
-            review_data['classification'] = review_data['review'].apply(lambda x: foodreviewssentiment_score(x[:512]))
-
-            review_data = review_data[review_data['classification'] != 'Neutral']
-
-            positive_count = len(review_data[review_data['classification'] == 'Positive'])
-            negative_count = len(review_data[review_data['classification'] == 'Negative'])
-
-            return review_data, positive_count, negative_count
-
-        except (requests.exceptions.RequestException, ValueError) as e:
-            print(f"Attempt {attempt + 1} failed: {e}")
-            time.sleep(2)
-
-    return pd.DataFrame(columns=['review', 'classification']), 0, 0
 
 # def foodreviewscreate_graphs(positive_count, negative_count, review_data):
 #     graphs = {}
@@ -1292,13 +1314,28 @@ def foodreviewssend_email(positive_count, negative_count, graphs):
     except Exception as e:
         print(f"Failed to send email: {e}")
 
+
 @app.route('/foodreviews', methods=['GET', 'POST'])
 def foodreviews():
+    # Check if user is logged in
+    if 'user_id' in session:
+        user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
+        username = user['name']  # Assuming the user's name is stored in the database
+    else:
+        username = None
     if request.method == 'POST':
         url = request.form.get('url')
+        try:
+            page_limit = int(request.form.get('page_limit', 1))  # Get the page limit from user input, default to 1
+            if page_limit < 1 or page_limit > 200:  # Validate the input range
+                raise ValueError("Page limit must be between 1 and 200.")
+        except ValueError:
+            flash("Invalid page limit. Please enter a number between 1 and 200.")
+            return redirect(request.url)
+
         if url:
             try:
-                review_data, positive_count, negative_count = foodreviewsscrape_reviews(url)
+                review_data, positive_count, negative_count = foodreviewsscrape_reviews(url, page_limit)
 
                 if review_data.empty:
                     raise ValueError("No review data was scraped.")
@@ -1306,9 +1343,7 @@ def foodreviews():
                 graphs_data = foodreviewscreate_graphs(positive_count, negative_count, review_data)
                 positive_reviews = review_data[review_data['classification'] == 'Positive']['review'].tolist()
                 negative_reviews = review_data[review_data['classification'] == 'Negative']['review'].tolist()
-                # Determine recommendation based on counts
                 recommendation = "Recommended" if positive_count > negative_count else "Not Recommended"
-
 
                 return render_template(
                     "foodreviews.html",
@@ -1319,23 +1354,16 @@ def foodreviews():
                     positive_reviews=positive_reviews,
                     negative_reviews=negative_reviews,
                     recommendation=recommendation,
+                    username=username,
                 )
             except Exception as e:
                 print(f"Error during scraping or processing: {e}")
-                # Provide default values for variables in case of failure
-                return render_template(
-                    "foodreviews.html",
-                    review_data=None,
-                    positive_count=0,
-                    negative_count=0,
-                    graphs_data=json.dumps({}),
-                    positive_reviews=[],
-                    negative_reviews=[],
-                    recommendation=None,
-                )
-    # Default GET request
+                flash("An error occurred during scraping. Please try again.")
+                return redirect(request.url)
+
     return render_template(
         "foodreviews.html",
+        username=username,
         review_data=None,
         positive_count=0,
         negative_count=0,
@@ -1343,6 +1371,65 @@ def foodreviews():
         positive_reviews=[],
         negative_reviews=[],
     )
+
+def foodreviewsscrape_reviews(url, page_limit=1, retries=3):
+    all_reviews = []
+    positive_count = 0
+    negative_count = 0
+    page = 0  # Start from the first page (start=0)
+
+    while page // 10 < page_limit:  # Loop based on user input for page_limit
+        try:
+            # Modify the URL for pagination by adding 'start={page}'
+            paginated_url = f"{url}?start={page}#reviews"
+
+            print(f"Scraping reviews from page: {page // 10 + 1} (URL: {paginated_url})")
+
+            # Make the request to the URL
+            r = requests.get(paginated_url, timeout=10)
+            r.raise_for_status()
+            soup = BeautifulSoup(r.text, 'html.parser')
+
+            # Find all review elements (adjust the class name as per your specific case)
+            regex = re.compile('.*comment.*')
+            results = soup.find_all('p', {'class': regex}) or soup.find_all('p')
+            reviews = [result.get_text(strip=True) for result in results if result.get_text(strip=True)]
+
+            if not reviews:  # If no reviews are found, break the loop
+                print("No more reviews found. Stopping scraping.")
+                break
+
+            # Print each review
+            for review in reviews:
+                print(review)
+
+            # Process the reviews for classification
+            review_data = pd.DataFrame({'review': reviews})
+            review_data['classification'] = review_data['review'].apply(lambda x: foodreviewssentiment_score(x[:512]))
+
+            # Filter out neutral reviews
+            review_data = review_data[review_data['classification'] != 'Neutral']
+
+            # Count the positive and negative reviews
+            positive_count += len(review_data[review_data['classification'] == 'Positive'])
+            negative_count += len(review_data[review_data['classification'] == 'Negative'])
+
+            # Add the reviews to the list
+            all_reviews.append(review_data)
+
+            # Increment the page by 10 for the next URL
+            page += 10
+
+        except (requests.exceptions.RequestException, ValueError) as e:
+            print(f"Error on page {page // 10 + 1}: {e}")
+            time.sleep(2)  # Retry after waiting 2 seconds
+
+    # Combine all the reviews from different pages into a single DataFrame
+    if all_reviews:
+        all_reviews_data = pd.concat(all_reviews, ignore_index=True)
+        return all_reviews_data, positive_count, negative_count
+
+    return pd.DataFrame(columns=['review', 'classification']), 0, 0
 
 
 

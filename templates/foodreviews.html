@@ -919,14 +919,71 @@
   </div>
 
   <div class="container mt-5" id="scroll_container">
-    <h1 class="text-center">Yelp Product Review Scrapper</h1>
-    <form method="POST" onsubmit="showLoader()">
-        <div class="form-group">
+    <h1 class="text-center">Yelp Business Review Scrapper</h1>
+    <form method="POST" onsubmit="return handleSubmit()">
+      <div class="form-group">
           <label for="url">Enter Yelp URL:</label>
           <input type="text" class="form-control" id="url" name="url" placeholder="https://www.yelp.com/..." required>
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">Scrape Reviews</button>
-      </form>  
+      </div>
+      <div class="form-group">
+          <label for="page_limit">Enter Page Limit:</label>
+          <input type="number" class="form-control" id="page_limit" placeholder="0, 1, 2" name="page_limit" min="1" max="200" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Scrape Reviews</button>
+    </form>
+
+    <script>
+      // Validate form and show loader
+      function handleSubmit() {
+        const pageLimit = document.getElementById('page_limit').value;
+    
+        // Validation logic
+        if (pageLimit < 1 || pageLimit > 200) {
+          alert('Page limit must be between 1 and 200.');
+          return false;
+        }
+    
+        // Show loader if validation passes
+        showLoader();
+        return true;
+      }
+    
+      // Show the loader
+      function showLoader() {
+        document.getElementById("loader").style.display = "flex";
+      }
+    
+      document.querySelectorAll('.graph-container img').forEach((img) => {
+        img.addEventListener('mouseover', function () {
+          this.style.cursor = 'pointer';
+        });
+    
+        img.addEventListener('mouseleave', function () {
+          this.style.cursor = 'default';
+        });
+      });
+    
+      window.onload = function () {
+        const scrollPosition = sessionStorage.getItem('scrollPosition');
+        if (scrollPosition) {
+            window.scrollTo({
+                top: parseInt(scrollPosition),
+                behavior: 'smooth' // Add smooth scrolling behavior
+            });
+        } else {
+            scrollToElement(); // Scroll to the container smoothly
+        }
+      };
+    
+      function scrollToElement() {
+        document.getElementById('scroll_container').scrollIntoView({
+            behavior: 'smooth', // Smooth scrolling
+            block: 'start'      // Align to the top of the div
+        });
+      }
+    </script>
+    
+   
       {% if review_data %}
     <div class="mt-5">
         <h3>Review Summary</h3>
