@@ -45,7 +45,6 @@ matplotlib.use('Agg')  # Use a non-interactive backend
 from nltk.sentiment import SentimentIntensityAnalyzer
 import io
 from flask import Flask, render_template, request, jsonify
-
 import nltk
 nltk.download('vader_lexicon')
 
@@ -275,6 +274,7 @@ app.config["MONGO_URI"] = "mongodb+srv://dawoodzahid488:BozqArXOh5NImhu3@cluster
 mongo = pymongo.MongoClient(app.config["MONGO_URI"])
 db = mongo.Zaibten  # Replace 'your_database' with your actual database name
 users_collection = db.users  # Replace with your users collection name
+
 
 
 @app.route('/')
@@ -548,14 +548,14 @@ def get_logged_in_user_email():
     return None
 
 def send_email(img_ios, product_name, product_status, total_good_reviews, total_bad_reviews):
-    sender_email = "muzamilkhanofficial786@gmail.com"
+    sender_email = "dawoodzahid488@gmail.com"
     recipient_email = get_logged_in_user_email()
     
     if not recipient_email:
         print("No recipient email found; email not sent.")
         return  # Exit function if recipient email is None
     
-    password = "iaqu xvna tpix ugkt"
+    password = "yrcd wubo xysl jgbi"
     msg = MIMEMultipart('related')
     msg['From'] = sender_email
     msg['To'] = recipient_email
@@ -706,7 +706,7 @@ def generate_graphs(summary):
 
 # Function to send email
 def send_email(summary, graph_buffer):
-    sender_email = "muzamilkhanofficial786@gmail.com"
+    sender_email = "dawoodzahid488@gmail.com"
     recipient_email = get_logged_in_user_email()
     # recipient_email = "muzamilkhanofficials@gmail.com"
     subject = f"{summary['product_name']} - Review Sentiment Analysis Report"
@@ -758,7 +758,7 @@ def send_email(summary, graph_buffer):
     try:
         with smtplib.SMTP('smtp.gmail.com', 587) as server:
             server.starttls()
-            server.login(sender_email, "iaqu xvna tpix ugkt")
+            server.login(sender_email, "yrcd wubo xysl jgbi")
             server.sendmail(sender_email, recipient_email, msg.as_string())
             print("Email sent successfully!")
     except Exception as e:
@@ -1239,8 +1239,8 @@ def foodreviewscreate_graphs(positive_count, negative_count, review_data):
 
 def foodreviewssend_email(positive_count, negative_count, graphs):
     # Sender email and recipient email
-    sender_email = "muzamilkhanofficial786@gmail.com"
-    recipient_email = "muzamilkhanofficials@gmail.com"
+    sender_email = "dawoodzahid488@gmail.com"
+    recipient_email = get_logged_in_user_email()
     subject = "Zaibten Review Sentiment Analysis Report"
 
     # Create the email message
@@ -1308,7 +1308,7 @@ def foodreviewssend_email(positive_count, negative_count, graphs):
     try:
         with smtplib.SMTP('smtp.gmail.com', 587) as server:
             server.starttls()
-            server.login(sender_email, "iaqu xvna tpix ugkt")  # Login with your email and password
+            server.login(sender_email, "yrcd wubo xysl jgbi")  # Login with your email and password
             server.sendmail(sender_email, recipient_email, msg.as_string())
             print("Email sent successfully!")
     except Exception as e:
