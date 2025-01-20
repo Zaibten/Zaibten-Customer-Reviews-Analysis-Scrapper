@@ -1436,6 +1436,7 @@ def send_email_with_graphs(summary, graphs_data):
         print(f"Failed to send email: {e}")
 
 @app.route('/foodreviews', methods=['GET', 'POST'])
+@login_required
 def foodreviews():
     # Check if user is logged in
     if 'user_id' in session:
