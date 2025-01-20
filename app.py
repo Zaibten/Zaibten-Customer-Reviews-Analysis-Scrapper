@@ -618,7 +618,7 @@ def Yelp_scrape_reviews(url, product_name):
                         "Date": date,
                         "Comment": comment,
                         "Feedback Type": feedback_type,
-                        "Sentiment Score": sentiment_score
+                        # "Sentiment Score": sentiment_score
                     })
                 except Exception as e:
                     print("Error processing review:", e)
@@ -1314,6 +1314,126 @@ def foodreviewssend_email(positive_count, negative_count, graphs):
     except Exception as e:
         print(f"Failed to send email: {e}")
 
+def create_graphs_for_email(positive_count, negative_count, review_data):
+    graphs_data = {}
+
+    # 1. Sentiment Analysis Bar Chart
+    fig, ax = plt.subplots()
+    ax.bar(["Positive", "Negative"], [positive_count, negative_count], color=["green", "red"])
+    ax.set_title("Sentiment Analysis - Bar Chart")
+    ax.set_ylabel("Count")
+    bar_buffer = io.BytesIO()
+    plt.savefig(bar_buffer, format="png")
+    plt.close(fig)
+    bar_buffer.seek(0)
+
+    # 2. Sentiment Analysis Pie Chart
+    fig, ax = plt.subplots()
+    ax.pie([positive_count, negative_count], labels=["Positive", "Negative"], colors=["green", "red"], autopct='%1.1f%%')
+    ax.set_title("Sentiment Analysis - Pie Chart")
+    pie_buffer = io.BytesIO()
+    plt.savefig(pie_buffer, format="png")
+    plt.close(fig)
+    pie_buffer.seek(0)
+
+    # 3. Sentiment Over Time Line Chart
+    review_data['sentiment_numeric'] = review_data['classification'].map({'Positive': 1, 'Negative': -1}).tolist()
+    fig, ax = plt.subplots()
+    ax.plot(review_data.index, review_data['sentiment_numeric'], color="blue")
+    ax.set_title("Sentiment Over Time")
+    ax.set_ylabel("Sentiment")
+    ax.set_xlabel("Time")
+    line_buffer = io.BytesIO()
+    plt.savefig(line_buffer, format="png")
+    plt.close(fig)
+    line_buffer.seek(0)
+
+    # 4. Word Frequency (Top 10)
+    from collections import Counter
+    word_counts = Counter(" ".join(review_data['review']).split())
+    top_words = word_counts.most_common(10)
+    words, counts = zip(*top_words)
+
+    fig, ax = plt.subplots()
+    ax.bar(words, counts)
+    ax.set_title("Top 10 Most Frequent Words")
+    ax.set_ylabel("Frequency")
+    ax.set_xticklabels(words, rotation=45, ha="right")
+    wordcloud_buffer = io.BytesIO()
+    plt.savefig(wordcloud_buffer, format="png")
+    plt.close(fig)
+    wordcloud_buffer.seek(0)
+
+    # Return graph data and buffers
+    return {
+        "sentiment_bar": bar_buffer,
+        "sentiment_pie": pie_buffer,
+        "sentiment_line": line_buffer,
+        "wordcloud": wordcloud_buffer,
+    }
+
+def send_email_with_graphs(summary, graphs_data):
+    sender_email = "dawoodzahid488@gmail.com"
+    recipient_email = get_logged_in_user_email()  # Ensure the email of the logged-in user
+    subject = f"{summary['product_name']} - Review Sentiment Analysis Report"
+
+    # Email message
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = recipient_email
+    msg['Subject'] = subject
+
+    # HTML Email Body
+    html_body = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; background-color: #f2f2f2; margin: 0; padding: 0; color: #333333;">
+        <div style="background-color: #ffffff; padding: 30px; text-align: center; border-bottom: 1px solid #ddd;">
+            <img src="cid:logo" alt="Zaibten Logo" style="border-radius: 10px; width: 120px; height: 120px;"/>
+            <h1 style="font-size: 26px; color: #333333; font-weight: 600; margin-top: 15px;">{summary['product_name']} Review Analysis</h1>
+            <p style="font-size: 18px; color: #666666; margin-top: 10px;">Here is the sentiment analysis of your product reviews.</p>
+        </div>
+        <div style="padding: 30px; background-color: #ffffff; margin: 30px auto; width: 90%; max-width: 650px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <h2 style="font-size: 22px; color: #333333; margin-bottom: 15px;">Summary</h2>
+            <p><strong>Good Reviews:</strong> <span style="color: #28a745;">{summary['good_reviews']}</span></p>
+            <p><strong>Bad Reviews:</strong> <span style="color: #e74c3c;">{summary['bad_reviews']}</span></p>
+            <p><strong>Neutral Reviews:</strong> {summary['neutral_reviews']}</p>
+            <p><strong>Recommendation:</strong> {summary['recommendation']}</p>
+        </div>
+        <div style="text-align: center; margin-top: 30px;">
+            <h2>Sentiment Distribution</h2>
+            <img src="cid:sentiment_bar" alt="Sentiment Bar Chart" style="width: 100%; max-width: 600px; border-radius: 8px;"/>
+            <h2>Sentiment Over Time</h2>
+            <img src="cid:sentiment_line" alt="Sentiment Over Time Line Chart" style="width: 100%; max-width: 600px; border-radius: 8px;"/>
+            <h2>Top 10 Words</h2>
+            <img src="cid:wordcloud" alt="Top 10 Words Word Cloud" style="width: 100%; max-width: 600px; border-radius: 8px;"/>
+        </div>
+    </body>
+    </html>
+    """
+    msg.attach(MIMEText(html_body, 'html'))
+
+    # Logo Attachment
+    with open("static/images/logo.png", "rb") as logo_file:
+        logo_data = logo_file.read()
+        logo = MIMEImage(logo_data, name="logo.png")
+        logo.add_header('Content-ID', '<logo>')
+        msg.attach(logo)
+
+    # Attach Graphs
+    for graph_name, graph_buffer in graphs_data.items():
+        graph_image = MIMEImage(graph_buffer.read(), name=f"{graph_name}.png")
+        graph_image.add_header('Content-ID', f'<{graph_name}>')
+        msg.attach(graph_image)
+
+    # SMTP Sending
+    try:
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()
+            server.login(sender_email, "yrcd wubo xysl jgbi")
+            server.sendmail(sender_email, recipient_email, msg.as_string())
+            print("Email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
 
 @app.route('/foodreviews', methods=['GET', 'POST'])
 def foodreviews():
@@ -1344,6 +1464,16 @@ def foodreviews():
                 positive_reviews = review_data[review_data['classification'] == 'Positive']['review'].tolist()
                 negative_reviews = review_data[review_data['classification'] == 'Negative']['review'].tolist()
                 recommendation = "Recommended" if positive_count > negative_count else "Not Recommended"
+                
+                graphs_data = create_graphs_for_email(positive_count, negative_count, review_data)
+                summary = {
+                    "product_name": "Sample Product",
+                    "good_reviews": positive_count,
+                    "bad_reviews": negative_count,
+                    "neutral_reviews": len(review_data) - positive_count - negative_count,
+                    "recommendation": "Recommended" if positive_count > negative_count else "Not Recommended"
+                }
+                send_email_with_graphs(summary, graphs_data)
 
                 return render_template(
                     "foodreviews.html",
