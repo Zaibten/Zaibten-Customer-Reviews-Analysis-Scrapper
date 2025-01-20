@@ -1443,6 +1443,7 @@ def foodreviews():
         username = user['name']  # Assuming the user's name is stored in the database
     else:
         username = None
+    
     if request.method == 'POST':
         url = request.form.get('url')
         try:
@@ -1460,21 +1461,34 @@ def foodreviews():
                 if review_data.empty:
                     raise ValueError("No review data was scraped.")
 
+                # Generate graphs data
                 graphs_data = foodreviewscreate_graphs(positive_count, negative_count, review_data)
-                positive_reviews = review_data[review_data['classification'] == 'Positive']['review'].tolist()
-                negative_reviews = review_data[review_data['classification'] == 'Negative']['review'].tolist()
-                recommendation = "Recommended" if positive_count > negative_count else "Not Recommended"
-                
-                graphs_data = create_graphs_for_email(positive_count, negative_count, review_data)
+
+                # Summary for the email
                 summary = {
-                    "product_name": "Sample Product",
+                    "product_name": "Your Product Name Here",  # Replace with actual product name if available
                     "good_reviews": positive_count,
                     "bad_reviews": negative_count,
-                    "neutral_reviews": len(review_data) - positive_count - negative_count,
-                    "recommendation": "Recommended" if positive_count > negative_count else "Not Recommended"
+                    "neutral_reviews": len(review_data) - (positive_count + negative_count),
+                    "recommendation": "Recommended" if positive_count > negative_count else "Not Recommended",
                 }
-                send_email_with_graphs(summary, graphs_data)
 
+                # Generate and attach graphs for the email
+                graph_buffer = BytesIO()  # Create an in-memory buffer for graphs
+                plt.figure(figsize=(10, 6))  # Example figure for demonstration
+                plt.bar(["Positive", "Negative"], [positive_count, negative_count], color=["green", "red"])
+                plt.title("Sentiment Analysis")
+                plt.savefig(graph_buffer, format='png')
+                plt.close()
+                graph_buffer.seek(0)  # Reset buffer position
+
+                # Send email with the summary and graph
+                send_email(summary, graph_buffer)
+
+                # Render results to the user
+                positive_reviews = review_data[review_data['classification'] == 'Positive']['review'].tolist()
+                negative_reviews = review_data[review_data['classification'] == 'Negative']['review'].tolist()
+                
                 return render_template(
                     "foodreviews.html",
                     review_data=review_data.to_html(classes="table table-bordered"),
@@ -1483,7 +1497,7 @@ def foodreviews():
                     graphs_data=json.dumps(graphs_data),
                     positive_reviews=positive_reviews,
                     negative_reviews=negative_reviews,
-                    recommendation=recommendation,
+                    recommendation=summary['recommendation'],
                     username=username,
                 )
             except Exception as e:
@@ -1501,6 +1515,7 @@ def foodreviews():
         positive_reviews=[],
         negative_reviews=[],
     )
+
 
 def foodreviewsscrape_reviews(url, page_limit=1, retries=3):
     all_reviews = []
