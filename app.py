@@ -274,8 +274,7 @@ app.config["MONGO_URI"] = "mongodb+srv://dawoodzahid488:BozqArXOh5NImhu3@cluster
 mongo = pymongo.MongoClient(app.config["MONGO_URI"])
 db = mongo.Zaibten  # Replace 'your_database' with your actual database name
 users_collection = db.users  # Replace with your users collection name
-
-
+reviews_collection = db.reviews  # Collection to store review data
 
 @app.route('/')
 @app.route('/home')
@@ -590,6 +589,7 @@ def Yelp_get_sentiment_score(comment):
         return "Neutral"
 
 
+
 def Yelp_scrape_reviews(url, product_name):
     driver = webdriver.Chrome()
     driver.get(url)
@@ -639,52 +639,6 @@ def Yelp_scrape_reviews(url, product_name):
     driver.quit()
     return reviews_data
 
-
-# Function to scrape reviews data
-# def Yelp_scrape_reviews(url, product_name):
-#     driver = webdriver.Chrome()
-#     driver.get(url)
-#     time.sleep(3)
-#     reviews_data = []
-
-#     while True:
-#         reviews_section = driver.find_elements(By.CSS_SELECTOR, "li.fdbk-container")
-#         for review in reviews_section:
-#             try:
-#                 username = review.find_element(By.CSS_SELECTOR, "div.fdbk-container__details__info__username span").text
-#                 date = review.find_element(By.CSS_SELECTOR, "span.fdbk-container__details__info__divide__time span").text
-#                 comment = review.find_element(By.CSS_SELECTOR, "div.fdbk-container__details__comment span").text.strip()
-#                 if not comment:
-#                     continue
-#                 feedback_type_icon = review.find_element(By.CSS_SELECTOR, "div.fdbk-container__details__info__icon svg")
-#                 feedback_type = feedback_type_icon.get_attribute("data-test-type")
-
-#                 sentiment_score = Yelp_get_sentiment_score(comment)
-
-#                 reviews_data.append({
-#                     "Product Name": product_name,
-#                     "Username": username,
-#                     "Date": date,
-#                     "Comment": comment,
-#                     "Feedback Type": feedback_type,
-#                     "Sentiment Score": feedback_type,
-#                 })
-#             except Exception as e:
-#                 print("An error occurred:", e)
-
-#         try:
-#             next_button = driver.find_element(By.CSS_SELECTOR, "a.pagination__next")
-#             next_href = next_button.get_attribute("href")
-#             driver.execute_script("arguments[0].click();", next_button)
-#             time.sleep(3)
-#             if next_button.get_attribute("href") == next_href:
-#                 break
-#         except:
-#             break
-
-#     driver.quit()
-#     return reviews_data
-
 # Function to generate graphs
 def generate_graphs(summary):
     # Pie chart for sentiment distribution
@@ -704,11 +658,27 @@ def generate_graphs(summary):
     plt.close(fig)
     return graph_buffer
 
-# Function to send email
+def save_to_mongo(summary, user_email):
+    """Save scraped data to MongoDB."""
+    review_data = {
+        "product_name": summary['product_name'],
+        "good_reviews": summary['good_reviews'],
+        "bad_reviews": summary['bad_reviews'],
+        "neutral_reviews": summary['neutral_reviews'],
+        "recommendation": summary['recommendation'],
+        "user_email": user_email
+    }
+    reviews_collection.insert_one(review_data)
+    print("Data saved to MongoDB successfully!")
+
 def send_email(summary, graph_buffer):
+    """Send email with sentiment analysis and attached graph."""
     sender_email = "dawoodzahid488@gmail.com"
-    recipient_email = get_logged_in_user_email()
-    # recipient_email = "muzamilkhanofficials@gmail.com"
+    recipient_email = get_logged_in_user_email()  # Function to fetch logged-in user's email
+    
+    # Save the scraped data to MongoDB
+    save_to_mongo(summary, recipient_email)
+
     subject = f"{summary['product_name']} - Review Sentiment Analysis Report"
 
     # Email message
@@ -763,7 +733,7 @@ def send_email(summary, graph_buffer):
             print("Email sent successfully!")
     except Exception as e:
         print(f"Failed to send email: {e}")
-
+        
 @app.route('/ebay_index', methods=['GET', 'POST'])
 @login_required
 def ebay_Index():
@@ -1237,82 +1207,6 @@ def foodreviewscreate_graphs(positive_count, negative_count, review_data):
     return graphs_data
 
 
-def foodreviewssend_email(positive_count, negative_count, graphs):
-    # Sender email and recipient email
-    sender_email = "dawoodzahid488@gmail.com"
-    recipient_email = get_logged_in_user_email()
-    subject = "Zaibten Review Sentiment Analysis Report"
-
-    # Create the email message
-    msg = MIMEMultipart()
-    msg['From'] = sender_email
-    msg['To'] = recipient_email
-    msg['Subject'] = subject
-
-    # HTML email body (modern and professional)
-    html_body = f"""
-    <html>
-    <body style="font-family: 'Arial', sans-serif; background-color: #f2f2f2; margin: 0; padding: 0; color: #333333;">
-        <!-- Header -->
-        <div style="background-color: #ffffff; padding: 30px; text-align: center; border-bottom: 1px solid #ddd;">
-            <img src="cid:logo" alt="Zaibten Logo" style="border-radius: 10px; width: 120px; height: 120px;"/>
-            <h1 style="font-size: 26px; color: #333333; font-weight: 600; margin-top: 15px;">Zaibten Sentiment Analysis Report</h1>
-            <p style="font-size: 18px; color: #666666; margin-top: 10px;">Here is the analysis of your product's review sentiments. Please find the detailed results below.</p>
-        </div>
-        
-        <!-- Main Content -->
-        <div style="padding: 30px; background-color: #ffffff; margin: 30px auto; width: 90%; max-width: 650px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-            <h2 style="font-size: 22px; color: #333333; margin-bottom: 15px;">Sentiment Overview</h2>
-            <p style="font-size: 16px; color: #333333; line-height: 1.6;">
-                <strong>Total Positive Reviews:</strong> <span style="color: #28a745; font-weight: bold;">{positive_count}</span><br>
-                <strong>Total Negative Reviews:</strong> <span style="color: #e74c3c; font-weight: bold;">{negative_count}</span><br><br>
-            </p>
-
-            <h3 style="font-size: 20px; color: #333333; margin-bottom: 15px;">Analysis Graphs</h3>
-            <p style="font-size: 16px; color: #555555; margin-bottom: 25px;">Below are the visual representations of the sentiment analysis results:</p>
-    """
-
-    # Attach graphs as images
-    for graph_name, graph_data in graphs.items():
-        img_data = base64.b64decode(graph_data)
-        image = MIMEImage(img_data, name=graph_name + '.png', _subtype="png")
-        image.add_header('Content-ID', f'<{graph_name}>')  # Content-ID for inline images
-        msg.attach(image)
-        html_body += f"""
-            <div style="margin-bottom: 30px;">
-                <img src="cid:{graph_name}" alt="{graph_name}" style="max-width: 100%; border-radius: 8px;"/>
-            </div>
-        """
-
-    # Footer with company info and contact
-    html_body += """
-        <div style="background-color: #ffffff; padding: 20px; text-align: center; font-size: 14px; color: #999999; margin-top: 30px;">
-            <p>&copy; 2025 Zaibten. All Rights Reserved.</p>
-            <p>For any queries or support, please contact us at <a href="mailto:support@zaibten.com" style="color: #555555; text-decoration: none;">support@zaibten.com</a></p>
-        </div>
-    </body>
-    </html>
-    """
-
-    # Attach the HTML body to the email
-    msg.attach(MIMEText(html_body, 'html'))
-
-    # Add the logo image as an inline attachment
-    with open("static/images/logo.png", "rb") as logo_file:
-        logo_data = logo_file.read()
-        logo = MIMEImage(logo_data, name="logo.png")
-        logo.add_header('Content-ID', '<logo>')
-        msg.attach(logo)
-
-    # Sending the email via SMTP server
-    try:
-        with smtplib.SMTP('smtp.gmail.com', 587) as server:
-            server.starttls()
-            server.login(sender_email, "yrcd wubo xysl jgbi")  # Login with your email and password
-            server.sendmail(sender_email, recipient_email, msg.as_string())
-            print("Email sent successfully!")
-    except Exception as e:
-        print(f"Failed to send email: {e}")
 
 def create_graphs_for_email(positive_count, negative_count, review_data):
     graphs_data = {}
@@ -1372,9 +1266,25 @@ def create_graphs_for_email(positive_count, negative_count, review_data):
         "wordcloud": wordcloud_buffer,
     }
 
+
+def save_review_data(summary, user_email):
+    """
+    Save scraped review data in MongoDB
+    """
+    review_data = {
+        "product_name": summary['product_name'],
+        "ratings": summary['ratings'],
+        "recommendation": summary['recommendation'],
+        "user_email": user_email,
+        "reviews": summary['reviews'],  # Storing all review text data
+    }
+    
+    reviews_collection.insert_one(review_data)  # Insert into MongoDB
+    print("Review data saved successfully!")
+
 def send_email_with_graphs(summary, graphs_data):
     sender_email = "dawoodzahid488@gmail.com"
-    recipient_email = get_logged_in_user_email()  # Ensure the email of the logged-in user
+    recipient_email = summary['user_email']
     subject = f"{summary['product_name']} - Review Sentiment Analysis Report"
 
     # Email message
@@ -1435,6 +1345,24 @@ def send_email_with_graphs(summary, graphs_data):
     except Exception as e:
         print(f"Failed to send email: {e}")
 
+# Example Usage
+summary_data = {
+    "product_name": "Samsung Galaxy S23",
+    "ratings": 4.5,
+    "recommendation": "Recommended",
+    "good_reviews": 120,
+    "bad_reviews": 30,
+    "neutral_reviews": 50,
+    "reviews": ["Excellent camera!", "Battery life could be better.", "Very smooth performance."],
+    "user_email": "user@example.com"
+}
+
+# Save to MongoDB
+save_review_data(summary_data, summary_data['user_email'])
+
+# Send Email
+send_email_with_graphs(summary_data, {})
+
 @app.route('/foodreviews', methods=['GET', 'POST'])
 @login_required
 def foodreviews():
@@ -1467,7 +1395,7 @@ def foodreviews():
 
                 # Summary for the email
                 summary = {
-                    "product_name": "Your Product Name Here",  # Replace with actual product name if available
+                    "product_name": "Yelp Business",  # Replace with actual product name if available
                     "good_reviews": positive_count,
                     "bad_reviews": negative_count,
                     "neutral_reviews": len(review_data) - (positive_count + negative_count),
