@@ -1541,6 +1541,18 @@ def foodreviewsscrape_reviews(url, page_limit=1, retries=3):
 
 
 
+import io
+import base64
+import matplotlib.pyplot as plt
+from collections import Counter
+
+def create_chart_image(plt):
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight')
+    plt.close()
+    buf.seek(0)
+    img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    return img_base64
 
 
 def mk_clean_text(text):
@@ -1736,35 +1748,96 @@ def merge_reviews():
         reviews = []
         good_count = 0
         bad_count = 0
+        neutral_count = 0
+
+        sentiment_counts = {'Amazon': Counter(), 'eBay': Counter()}
+        overall_sentiments = Counter()
 
         for r in reviews_amazon:
-            sentiment = TextBlob(r['text']).sentiment.polarity
-            label = "Positive" if sentiment > 0.2 else "Negative" if sentiment < -0.2 else "Neutral"
+            sentiment_score = TextBlob(r['text']).sentiment.polarity
+            label = "Positive" if sentiment_score > 0.2 else "Negative" if sentiment_score < -0.2 else "Neutral"
+            sentiment_counts['Amazon'][label] += 1
+            overall_sentiments[label] += 1
             if label == "Positive":
                 good_count += 1
             elif label == "Negative":
                 bad_count += 1
+            else:
+                neutral_count += 1
             reviews.append({**r, 'source': 'Amazon', 'sentiment': label})
 
         for r in reviews_ebay:
-            sentiment = TextBlob(r['text']).sentiment.polarity
-            label = "Positive" if sentiment > 0.2 else "Negative" if sentiment < -0.2 else "Neutral"
+            sentiment_score = TextBlob(r['text']).sentiment.polarity
+            label = "Positive" if sentiment_score > 0.2 else "Negative" if sentiment_score < -0.2 else "Neutral"
+            sentiment_counts['eBay'][label] += 1
+            overall_sentiments[label] += 1
             if label == "Positive":
                 good_count += 1
             elif label == "Negative":
                 bad_count += 1
+            else:
+                neutral_count += 1
             reviews.append({**r, 'source': 'eBay', 'sentiment': label})
 
         recommendation = "Recommended" if good_count > bad_count else "Not Recommended"
 
         send_email(product_name, recommendation, good_count, bad_count)
 
+        # --- Create 4 charts ---
+
+        # 1. Pie chart: Overall sentiment distribution
+        plt.figure(figsize=(6, 6))
+        labels = list(overall_sentiments.keys())
+        sizes = list(overall_sentiments.values())
+        colors = ['green', 'red', 'gray']
+        plt.pie(sizes, labels=labels, colors=colors[:len(labels)], autopct='%1.1f%%', startangle=140)
+        plt.title('Overall Sentiment Distribution')
+        chart1 = create_chart_image(plt)
+
+        # 2. Bar chart: Amazon sentiment counts
+        plt.figure(figsize=(6, 4))
+        amazon_labels = list(sentiment_counts['Amazon'].keys())
+        amazon_values = [sentiment_counts['Amazon'][l] for l in amazon_labels]
+        plt.bar(amazon_labels, amazon_values, color=['green', 'red', 'gray'][:len(amazon_labels)])
+        plt.title('Amazon Sentiment Counts')
+        plt.xlabel('Sentiment')
+        plt.ylabel('Count')
+        chart2 = create_chart_image(plt)
+
+        # 3. Bar chart: eBay sentiment counts
+        plt.figure(figsize=(6, 4))
+        ebay_labels = list(sentiment_counts['eBay'].keys())
+        ebay_values = [sentiment_counts['eBay'][l] for l in ebay_labels]
+        plt.bar(ebay_labels, ebay_values, color=['green', 'red', 'gray'][:len(ebay_labels)])
+        plt.title('eBay Sentiment Counts')
+        plt.xlabel('Sentiment')
+        plt.ylabel('Count')
+        chart3 = create_chart_image(plt)
+
+        # 4. Comparison chart: Amazon vs eBay Positive vs Negative counts
+        categories = ['Positive', 'Negative', 'Neutral']
+        amazon_vals = [sentiment_counts['Amazon'].get(cat, 0) for cat in categories]
+        ebay_vals = [sentiment_counts['eBay'].get(cat, 0) for cat in categories]
+        x = range(len(categories))
+
+        plt.figure(figsize=(7, 5))
+        plt.bar(x, amazon_vals, width=0.4, label='Amazon', color='blue', align='center')
+        plt.bar([i + 0.4 for i in x], ebay_vals, width=0.4, label='eBay', color='orange', align='center')
+        plt.xticks([i + 0.2 for i in x], categories)
+        plt.xlabel('Sentiment')
+        plt.ylabel('Count')
+        plt.title('Amazon vs eBay Sentiment Comparison')
+        plt.legend()
+        chart4 = create_chart_image(plt)
+
         return render_template('merge.html', reviews=reviews, product_name=product_name,
                                recommendation=recommendation, username=username,
-                               reviews_amazon=reviews_amazon, reviews_ebay=reviews_ebay)
+                               reviews_amazon=reviews_amazon, reviews_ebay=reviews_ebay,
+                               chart1=chart1, chart2=chart2, chart3=chart3, chart4=chart4)
 
     # For GET requests also pass username!
     return render_template('merge.html', username=username)
+
 
 if __name__ == '__main__':
     app.run(debug=False,host='0.0.0.0')

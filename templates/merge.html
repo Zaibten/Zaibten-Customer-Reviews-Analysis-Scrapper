@@ -721,6 +721,57 @@ window.onload = function() {
         </div>
     {% endif %}
 
+   <style>
+  .charts-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px; /* space between charts */
+    max-width: 1300px; /* optional max width */
+    margin: auto;
+  }
+  .chart-item {
+    flex: 0 1 45%; /* each chart takes about 45% width */
+    text-align: center;
+  }
+  .chart-item img {
+    max-width: 100%;
+    height: auto;
+  }
+</style>
+
+<div class="charts-container">
+  {% if chart1 %}
+  <div class="chart-item">
+    <h2>Overall Sentiment Distribution</h2>
+    <img src="data:image/png;base64,{{ chart1 }}">
+  </div>
+  {% endif %}
+
+  {% if chart2 %}
+  <div class="chart-item">
+    <h2>Amazon Sentiment Counts</h2>
+    <img src="data:image/png;base64,{{ chart2 }}">
+  </div>
+  {% endif %}
+
+  {% if chart3 %}
+  <div class="chart-item">
+    <h2>eBay Sentiment Counts</h2>
+    <img src="data:image/png;base64,{{ chart3 }}">
+  </div>
+  {% endif %}
+
+  {% if chart4 %}
+  <div class="chart-item">
+    <h2>Amazon vs eBay Sentiment Comparison</h2>
+    <img src="data:image/png;base64,{{ chart4 }}">
+  </div>
+  {% endif %}
+</div>
+
+
+
     <div id="loader" style="
         display: none;
         position: absolute;
