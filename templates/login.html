@@ -10,14 +10,7 @@
     <script src="static/script.js" defer></script>
     
   <link rel="icon" href="static/images/logo.png" type="image/png" />
-<style>
-    .error-message {
-    color: red;
-    font-size: 0.9rem;
-    margin-top: 5px;
-}
 
-</style>
 </head>
 <body>
     <div class="container" id="container">
@@ -41,9 +34,6 @@
                     <input type="password" id="signup-password" name="password" placeholder="Password" required />
                     <i class="fas fa-eye" id="signup-eye" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" onclick="togglePassword('signup-password', 'signup-eye')"></i>
                 </div>
-                {% if invalid %}
-<p class="error-message">Invalid credentials. Please try again.</p>
-{% endif %}
                 <button type="submit" style="cursor: hand;">Sign Up</button>
             </form>
         </div>
@@ -110,31 +100,32 @@
                 eyeIcon.classList.add("fa-eye");
             }
         }
-    
+
         // Validate Email and Password
         function validateForm(formType) {
-            const email = document.getElementById(`${formType}-email`).value;
-            const password = document.getElementById(`${formType}-password`).value;
-            const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    
-            if (!emailPattern.test(email)) {
-                alert("Please enter a valid email address.");
-                return false;
-            }
-    
-            if (password.length < 8) {
-                alert("Password must be at least 8 characters long.");
-                return false;
-            }
-    
-            return true;
-        }
-    
-        // Toggle between sign-up and sign-in panels
+    const email = document.getElementById(`${formType}-email`).value;
+    const password = document.getElementById(`${formType}-password`).value;
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+    if (!emailPattern.test(email)) {
+        alert("Please enter a valid email address.");
+        return false;
+    }
+
+    if (password.length < 8) {
+        alert("Password must be at least 8 characters long.");
+        return false;
+    }
+
+    return true;
+}
+
+
         const container = document.getElementById('container');
         const signUpBtn = document.getElementById('signUpBtn');
         const signInBtn = document.getElementById('signInBtn');
     
+        // Toggle between sign-up and sign-in panels
         signUpBtn.addEventListener('click', () => {
             container.classList.add('right-panel-active');
         });
@@ -143,12 +134,11 @@
             container.classList.remove('right-panel-active');
         });
     
-        // Show alert for invalid login if 'invalid' is passed from Flask
-        const invalidLogin = {{ invalid | tojson }};
+        // Injecting the invalid flag from Flask/Jinja into JavaScript correctly
+        //const invalidLogin = {{ invalid | tojson }};
         if (invalidLogin) {
             alert("Invalid credentials, please try again.");
         }
     </script>
-    
 </body>
 </html>

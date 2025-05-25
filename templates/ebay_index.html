@@ -632,7 +632,7 @@
                     <ul class="dropdown-menu" aria-labelledby="liveScrapDropdown">
                       <li><a class="dropdown-item" href="/foodreviews">Yelp Scrapper</a></li>
                       <li><a class="dropdown-item" href="/livescrap">Amazon Scrapper</a></li>
-                      <li><a class="dropdown-item" href="/ebay_index">Ebay Scrapper</a></li>
+                      <li><a class="dropdown-item" href="/ebay_index">Ebay Scrapper</a></li><li><a class="dropdown-item" href="/merge">Merge Scrapper</a></li>
                       <!-- <li><a class="dropdown-item" href="/scrap-help">Help</a></li> -->
                     </ul>
                   </li>
@@ -734,8 +734,7 @@
                           Reviews Needs
                         </h1>
                         <p>
-                          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus quidem maiores perspiciatis, illo maxime voluptatem a itaque suscipit.
-                        </p>
+                          Web scraping is the automated process of extracting data from websites. It involves sending requests, parsing HTML content, and gathering valuable information such as reviews, prices, or product details efficiently.                        </p>
                         <div class="btn-box">
                           <a href="" class="btn1">
                             Contact Us
@@ -764,8 +763,7 @@
                           Reviews Needs
                         </h1>
                         <p>
-                          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus quidem maiores perspiciatis, illo maxime voluptatem a itaque suscipit.
-                        </p>
+                          Web scraping is the automated process of extracting data from websites. It involves sending requests, parsing HTML content, and gathering valuable information such as reviews, prices, or product details efficiently.                        </p>
                         <div class="btn-box">
                           <a href="" class="btn1">
                             Contact Us
@@ -794,8 +792,7 @@
                           Reviews Needs
                         </h1>
                         <p>
-                          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus quidem maiores perspiciatis, illo maxime voluptatem a itaque suscipit.
-                        </p>
+                          Web scraping is the automated process of extracting data from websites. It involves sending requests, parsing HTML content, and gathering valuable information such as reviews, prices, or product details efficiently.                        </p>
                         <div class="btn-box">
                           <a href="" class="btn1">
                             Contact Us
@@ -829,11 +826,11 @@
         <form method="POST" onsubmit="showLoader()">
             <div class="form-group">
                 <label for="product_name">Product Name</label>
-                <input type="text" class="form-control" id="product_name" placeholder="charger, mobile phone, wire..." name="product_name" required>
+                <input type="text" class="form-control" id="product_name" name="product_name" required>
             </div>
             <div class="form-group">
                 <label for="url">Product Reviews URL</label>
-                <input type="url" class="form-control" id="url" placeholder="https://www.ebay.ca/fdbk/mweb_profile?fdbkType=FeedbackReceivedAsSeller......." name="url" required>
+                <input type="url" class="form-control" id="url" name="url" required>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Scrape Reviews</button>
         </form>

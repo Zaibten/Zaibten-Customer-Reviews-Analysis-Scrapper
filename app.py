@@ -5,6 +5,9 @@ import re
 from bson import ObjectId
 from flask import Flask, flash, render_template, request, redirect, url_for, session
 import pandas as pd
+from flask import request, redirect, url_for, render_template
+from datetime import datetime
+
 import requests
 from transformers import pipeline
 import matplotlib.pyplot as plt
@@ -47,6 +50,31 @@ import io
 from flask import Flask, render_template, request, jsonify
 import nltk
 nltk.download('vader_lexicon')
+
+
+
+
+
+
+
+
+
+
+
+import csv
+import re
+from urllib.parse import quote
+import time
+import os
+import random
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, WebDriverException
+from selenium.webdriver.common.action_chains import ActionChains
 
 app = Flask(__name__)
 
@@ -333,20 +361,28 @@ def login():
 
 # Route for signup
 @app.route('/signup', methods=['GET', 'POST'])
+
 def signup():
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
+        
         existing_user = users_collection.find_one({"email": email})
         if existing_user:
             return 'User already exists'
-        users_collection.insert_one({"name": name, "email": email, "password": password})
+        
+        current_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # or just '%Y-%m-%d'
+        
+        users_collection.insert_one({
+            "name": name,
+            "email": email,
+            "password": password,
+            "created_at": current_date  # <--- date field added here
+        })
         return redirect(url_for('login'))
+    
     return render_template('signup.html')
-
-# Dashboard route (after login)
-
 @app.route('/layout')
 def dashboard():
     if 'user_id' in session:
@@ -666,7 +702,8 @@ def save_to_mongo(summary, user_email):
         "bad_reviews": summary['bad_reviews'],
         "neutral_reviews": summary['neutral_reviews'],
         "recommendation": summary['recommendation'],
-        "user_email": user_email
+        "user_email": user_email,
+        "created_at": datetime.now()  # Store real-time timestamp
     }
     reviews_collection.insert_one(review_data)
     print("Data saved to MongoDB successfully!")
@@ -1267,6 +1304,8 @@ def create_graphs_for_email(positive_count, negative_count, review_data):
     }
 
 
+
+
 def save_review_data(summary, user_email):
     """
     Save scraped review data in MongoDB
@@ -1277,12 +1316,16 @@ def save_review_data(summary, user_email):
         "recommendation": summary['recommendation'],
         "user_email": user_email,
         "reviews": summary['reviews'],  # Storing all review text data
+        "created_at": datetime.now()  # Store real-time timestamp
     }
     
     reviews_collection.insert_one(review_data)  # Insert into MongoDB
     print("Review data saved successfully!")
 
 def send_email_with_graphs(summary, graphs_data):
+    # Save to MongoDB (moved inside function)
+    save_review_data(summary, summary['user_email'])
+
     sender_email = "dawoodzahid488@gmail.com"
     recipient_email = summary['user_email']
     subject = f"{summary['product_name']} - Review Sentiment Analysis Report"
@@ -1345,23 +1388,8 @@ def send_email_with_graphs(summary, graphs_data):
     except Exception as e:
         print(f"Failed to send email: {e}")
 
-# Example Usage
-summary_data = {
-    "product_name": "Samsung Galaxy S23",
-    "ratings": 4.5,
-    "recommendation": "Recommended",
-    "good_reviews": 120,
-    "bad_reviews": 30,
-    "neutral_reviews": 50,
-    "reviews": ["Excellent camera!", "Battery life could be better.", "Very smooth performance."],
-    "user_email": "user@example.com"
-}
+# send_email_with_graphs(summary_data, {})
 
-# Save to MongoDB
-save_review_data(summary_data, summary_data['user_email'])
-
-# Send Email
-send_email_with_graphs(summary_data, {})
 
 @app.route('/foodreviews', methods=['GET', 'POST'])
 @login_required
@@ -1506,6 +1534,237 @@ def foodreviewsscrape_reviews(url, page_limit=1, retries=3):
     return pd.DataFrame(columns=['review', 'classification']), 0, 0
 
 
+
+
+
+
+
+
+
+
+
+def mk_clean_text(text):
+    return re.sub(r'\s+', ' ', text.strip())
+
+def mk_setup_driver():
+    chrome_options = Options()
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option("useAutomationExtension", False)
+    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument(f"--window-size={random.randint(1200, 1600)},{random.randint(800, 1000)}")
+    chrome_options.add_argument("--enable-javascript")
+    chrome_options.add_argument("--blink-settings=imagesEnabled=true")
+    service = Service()
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+
+    driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+        "source": """
+            Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+            Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
+            Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+            Object.defineProperty(window, 'chrome', { get: () => ({ runtime: {} }) });
+            Object.defineProperty(navigator, 'platform', { get: () => 'Win32' });
+            window.navigator.chrome = { runtime: {} };
+        """
+    })
+    return driver
+
+def mk_simulate_human_behavior(driver):
+    try:
+        actions = ActionChains(driver)
+        for _ in range(random.randint(2, 5)):
+            actions.move_by_offset(random.randint(-100, 100), random.randint(-100, 100)).pause(random.uniform(0.2, 0.8))
+        actions.perform()
+        time.sleep(random.uniform(0.5, 1.5))
+        scroll_amount = random.randint(100, 600)
+        driver.execute_script(f"window.scrollTo(0, {scroll_amount});")
+        time.sleep(random.uniform(0.5, 2))
+        try:
+            safe_element = driver.find_element(By.CSS_SELECTOR, 'body')
+            actions.move_to_element(safe_element).click().perform()
+            time.sleep(random.uniform(0.3, 1))
+        except:
+            pass
+    except Exception as e:
+        print(f"Error in human behavior simulation: {e}")
+
+def mk_scrape_amazon_reviews(product_name, driver, max_stores=3, max_reviews=5):
+    reviews = []
+    search_url = f"https://www.amazon.com/s?k={quote(product_name)}"
+    scrape_time = time.strftime("%I:%M %p %Z, %A, %B %d, %Y")
+
+    try:
+        driver.get(search_url)
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))
+        mk_simulate_human_behavior(driver)
+
+        product_links = driver.find_elements(By.CSS_SELECTOR, 'a.a-link-normal.s-no-outline')[:max_stores]
+        if not product_links:
+            return reviews
+
+        product_urls = [link.get_attribute('href') for link in product_links]
+        for url in product_urls:
+            try:
+                driver.get(url)
+                WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))
+                mk_simulate_human_behavior(driver)
+                review_elements = driver.find_elements(By.CSS_SELECTOR, 'span[data-hook="review-body"]')[:max_reviews]
+                if review_elements:
+                    for review in review_elements:
+                        reviews.append({'text': mk_clean_text(review.text), 'time': scrape_time})
+                else:
+                    reviews.append({'text': "No review found for this product.", 'time': scrape_time})
+            except WebDriverException as e:
+                reviews.append({'text': "Error retrieving review.", 'time': scrape_time})
+            time.sleep(random.uniform(2, 5))
+
+    except (TimeoutException, WebDriverException) as e:
+        print(f"Error scraping Amazon search page: {e}")
+    return reviews
+
+def mk_scrape_ebay_reviews(product_name, driver, max_stores=3, max_reviews=5):
+    reviews = []
+    search_url = f"https://www.ebay.com/sch/i.html?_nkw={quote(product_name)}"
+    scrape_time = time.strftime("%I:%M %p %Z, %A, %B %d, %Y")
+
+    try:
+        driver.get(search_url)
+        time.sleep(5)
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))
+        mk_simulate_human_behavior(driver)
+
+        product_links = driver.find_elements(By.CSS_SELECTOR, 'a.s-item__link')[:max_stores]
+        if not product_links:
+            return reviews
+
+        product_urls = [link.get_attribute('href') for link in product_links]
+        for url in product_urls:
+            try:
+                driver.get(url)
+                WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))
+                mk_simulate_human_behavior(driver)
+
+                try:
+                    feedback_tab = driver.find_element(By.CSS_SELECTOR, 'a[href*="#UserReviews"]')
+                    actions = ActionChains(driver)
+                    actions.move_to_element(feedback_tab).click().perform()
+                    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.fdbk-container__details__comment")))
+                    time.sleep(random.uniform(1, 3))
+                    mk_simulate_human_behavior(driver)
+                except:
+                    pass
+
+                review_elements = driver.find_elements(By.CSS_SELECTOR, 'div.fdbk-container__details__comment')[:max_reviews]
+                if review_elements:
+                    for review in review_elements:
+                        reviews.append({'text': mk_clean_text(review.text), 'time': scrape_time})
+                else:
+                    reviews.append({'text': "No review found for this product.", 'time': scrape_time})
+            except WebDriverException as e:
+                reviews.append({'text': "Error retrieving review.", 'time': scrape_time})
+            time.sleep(random.uniform(2, 5))
+
+    except (TimeoutException, WebDriverException) as e:
+        print(f"Error scraping eBay search page: {e}")
+    return reviews
+
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+def send_email(product_name, product_status, total_good_reviews, total_bad_reviews):
+    sender_email = "dawoodzahid488@gmail.com"
+    recipient_email = get_logged_in_user_email()  # Your function to get logged in user's email
+    
+    if not recipient_email:
+        print("No recipient email found; email not sent.")
+        return
+    
+    password = "yrcd wubo xysl jgbi"
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = recipient_email
+    msg['Subject'] = f"Review Analysis for Product: {product_name}"
+
+    body = f"""
+    Hello,
+
+    Here is the review analysis summary for the product: {product_name}
+
+    Recommendation Status: {product_status}
+    Total Positive Reviews: {total_good_reviews}
+    Total Negative Reviews: {total_bad_reviews}
+
+    Thank you for using our service!
+
+    Best regards,
+    Your Review Analysis Team
+    """
+
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(sender_email, password)
+        server.sendmail(sender_email, recipient_email, msg.as_string())
+        server.quit()
+        print("Email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
+@login_required
+@app.route('/merge', methods=['GET', 'POST'])
+def merge_reviews():
+    if 'user_id' in session:
+        user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
+        username = user['name']
+    else:
+        username = None
+
+    if request.method == 'POST':
+        product_name = request.form['product_name']
+        driver = mk_setup_driver()
+        reviews_amazon = mk_scrape_amazon_reviews(product_name, driver)
+        reviews_ebay = mk_scrape_ebay_reviews(product_name, driver)
+        driver.quit()
+
+        reviews = []
+        good_count = 0
+        bad_count = 0
+
+        for r in reviews_amazon:
+            sentiment = TextBlob(r['text']).sentiment.polarity
+            label = "Positive" if sentiment > 0.2 else "Negative" if sentiment < -0.2 else "Neutral"
+            if label == "Positive":
+                good_count += 1
+            elif label == "Negative":
+                bad_count += 1
+            reviews.append({**r, 'source': 'Amazon', 'sentiment': label})
+
+        for r in reviews_ebay:
+            sentiment = TextBlob(r['text']).sentiment.polarity
+            label = "Positive" if sentiment > 0.2 else "Negative" if sentiment < -0.2 else "Neutral"
+            if label == "Positive":
+                good_count += 1
+            elif label == "Negative":
+                bad_count += 1
+            reviews.append({**r, 'source': 'eBay', 'sentiment': label})
+
+        recommendation = "Recommended" if good_count > bad_count else "Not Recommended"
+
+        send_email(product_name, recommendation, good_count, bad_count)
+
+        return render_template('merge.html', reviews=reviews, product_name=product_name,
+                               recommendation=recommendation, username=username,
+                               reviews_amazon=reviews_amazon, reviews_ebay=reviews_ebay)
+
+    # For GET requests also pass username!
+    return render_template('merge.html', username=username)
 
 if __name__ == '__main__':
     app.run(debug=False,host='0.0.0.0')
