@@ -1684,11 +1684,11 @@ def mk_scrape_ebay_reviews(product_name, driver, max_stores=3, max_reviews=5):
         print(f"Error scraping eBay search page: {e}")
     return reviews
 
-import smtplib
+from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-def send_email(product_name, product_status, total_good_reviews, total_bad_reviews):
+def send_email(product_name, product_status, total_good_reviews, total_bad_reviews, reviews):
     sender_email = "dawoodzahid488@gmail.com"
     recipient_email = get_logged_in_user_email()  # Your function to get logged in user's email
     
@@ -1697,27 +1697,54 @@ def send_email(product_name, product_status, total_good_reviews, total_bad_revie
         return
     
     password = "yrcd wubo xysl jgbi"
-    msg = MIMEMultipart()
+    msg = MIMEMultipart("alternative")
     msg['From'] = sender_email
     msg['To'] = recipient_email
     msg['Subject'] = f"Review Analysis for Product: {product_name}"
 
-    body = f"""
-    Hello,
+    # Build table rows for reviews
+    html_reviews_rows = ""
+    for review in reviews:
+        html_reviews_rows += f"""
+        <tr>
+            <td>{review.get('source', 'Unknown')}</td>
+            <td>{review.get('sentiment', 'N/A')}</td>
+            <td>{review.get('time', '')}</td>
+            <td><i>{review.get('text', '')}</i></td>
+        </tr>
+        """
 
-    Here is the review analysis summary for the product: {product_name}
-
-    Recommendation Status: {product_status}
-    Total Positive Reviews: {total_good_reviews}
-    Total Negative Reviews: {total_bad_reviews}
-
-    Thank you for using our service!
-
-    Best regards,
-    Your Review Analysis Team
+    html_body = f"""
+    <html>
+    <body>
+      <h2>Review Analysis Summary for <em>{product_name}</em></h2>
+      <p><b>Recommendation Status:</b> {product_status}</p>
+      <p><b>Total Positive Reviews:</b> {total_good_reviews}</p>
+      <p><b>Total Negative Reviews:</b> {total_bad_reviews}</p>
+      <hr>
+      <h3>Extracted Reviews:</h3>
+      <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">
+        <thead>
+          <tr style="background-color:#f2f2f2;">
+            <th>Source</th>
+            <th>Sentiment</th>
+            <th>Time</th>
+            <th>Review Text</th>
+          </tr>
+        </thead>
+        <tbody>
+          {html_reviews_rows}
+        </tbody>
+      </table>
+      <p>Thank you for using our service!</p>
+      <p>Best regards,<br>Your Review Analysis Team</p>
+    </body>
+    </html>
     """
 
-    msg.attach(MIMEText(body, 'plain'))
+    # Attach parts into message container
+    part = MIMEText(html_body, "html")
+    msg.attach(part)
 
     try:
         server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -1781,7 +1808,8 @@ def merge_reviews():
 
         recommendation = "Recommended" if good_count > bad_count else "Not Recommended"
 
-        send_email(product_name, recommendation, good_count, bad_count)
+        send_email(product_name, recommendation, good_count, bad_count, reviews)
+
 
         # --- Create 4 charts ---
 
